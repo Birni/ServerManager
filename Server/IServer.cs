@@ -4,24 +4,22 @@ using System.Text;
 
 namespace Server
 {
-   public class IServer
+   public class IServer : IEqualityComparer<IServer>
     {
-        int ServerIdentifier { get; set; }
-        string ServerName { get; set; }
-        string ArkSurvivalFolder { get; set; }
-        string Map { get; set; }
-        string ServerIp { get; set; }
-        string ServerStartArgument { get; set; }
-        int QueryPort { get; set; }
-        int Port { get; set; }
-        bool RconEnabled { get; set; }
-        int RconPort { get; set; }
-        int maxPlayer { get; set; }
+        public string ServerName { get; set; }
+        public string ArkSurvivalFolder { get; set; }
+        public string Map { get; set; }
+        public string ServerIp { get; set; }
+        public string ServerStartArgument { get; set; }
+        public int QueryPort { get; set; }
+        public int Port { get; set; }
+        public bool RconEnabled { get; set; }
+        public int RconPort { get; set; }
+        public int maxPlayer { get; set; }
 
-
-        public IServer(string name)
+        public IServer(string key)
         {
-            ServerName = name;
+            ServerName = key;
             ArkSurvivalFolder = "C:\\SERVER\\TheIsland";
             Map = "TheIsland";
             ServerIp = "127.0.0.1";
@@ -33,54 +31,20 @@ namespace Server
             maxPlayer = 60;
         }
 
-        public string GetServerName()
+
+        public IServer()
         {
-            return ServerName;
         }
 
-        public string GetServerArkSurvivalFolder()
+        public bool Equals(IServer x, IServer y)
         {
-            return ArkSurvivalFolder;
+            return x.ServerName == y.ServerName;
         }
 
-        public string GetServerMap()
+        public int GetHashCode(IServer obj)
         {
-            return Map;
-        }
-
-        public string GetServerIp()
-        {
-            return ServerIp;
-        }
-
-        public int GetServerQueryPort()
-        {
-            return QueryPort;
-        }
-
-        public int GetServerPort()
-        {
-            return Port;
-        }
-
-        public bool GetServerRconEnabeld()
-        {
-            return RconEnabled;
-        }
-
-        public int GetServerRconPort()
-        {
-            return RconPort;
-        }
-
-        public int GetServerMaxPlayer()
-        {
-            return maxPlayer;
-        }
-
-        public string GetServerStartArgument()
-        {
-            return ServerStartArgument;
+            IServer se = (IServer)obj;
+            return se.ServerName.GetHashCode();
         }
     }
 }

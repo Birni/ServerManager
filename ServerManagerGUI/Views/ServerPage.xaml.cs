@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
+using ServerManagerGUI.ViewModels;
 using Server;
 
 namespace ServerManagerGUI.Views
@@ -17,10 +18,12 @@ namespace ServerManagerGUI.Views
     public partial class ServerPage : UserControl
     {
         IServer mServer;
+        MainViewModel _MainView;
 
-        public ServerPage(IServer server)
+        public ServerPage(MainViewModel MainView, IServer server)
         {
             mServer = server;
+            _MainView = MainView;
 
             InitializeComponent(); 
         }
@@ -49,12 +52,17 @@ namespace ServerManagerGUI.Views
             }
         }
 
+        private void StartServer_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
         private void StopSettings_Click(object sender, RoutedEventArgs e)
         {
 
             Window window = new Window
             {
-                Content = new ServerSettingsPage(ref mServer)
+                Content = new ServerSettingsPage(_MainView, mServer)
             };
 
             window.ShowDialog();

@@ -1,5 +1,7 @@
 ﻿using MahApps.Metro.Controls;
 using MahApps.Metro.IconPacks;
+using System.Collections.Generic;
+using ServerManagerGUI;
 using ServerManagerGUI.Views;
 using Server;
 
@@ -10,11 +12,24 @@ namespace ServerManagerGUI.ViewModels
         private HamburgerMenuItemCollection _menuItems;
         private HamburgerMenuItemCollection _menuOptionItems;
 
-        public IServerList mIServerList = new IServerList();
+        IServerList ServerList = new IServerList();
+
 
         public MainViewModel()
         {
-            this.CreateMenuItems();
+            /* TODO: remove testing stuff */
+            IServer server1 = new IServer("Ragnarok");
+            ServerList.AddOrUpdateServer(server1);
+
+            IServer server2 = new IServer("awsome server");
+            ServerList.AddOrUpdateServer(server2);
+
+            CreateMenuItems();
+        }
+        
+        public void RefreshMenu()
+        {
+            CreateMenuItems();
         }
 
         public void CreateMenuItems()
@@ -37,15 +52,15 @@ namespace ServerManagerGUI.ViewModels
                 }
             };
 
-             foreach (IServer server in mIServerList)
+            foreach (KeyValuePair<string, IServer> server in ServerList.GetserverList())
             {
 
                 MenuItems.Add(new HamburgerMenuIconItem()
                 {
                     Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.ServerSolid },
-                    Label = server.GetServerName(),
-                    ToolTip = server.GetServerName() + " settings.",
-                    Tag = new ServerPage(server)
+                    Label = server.Key,
+                    ToolTip = server.Key + " settings.",
+                    Tag = new ServerPage(this , server.Value)
                 }
                 );
             }

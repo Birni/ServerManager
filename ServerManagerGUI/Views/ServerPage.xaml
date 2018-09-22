@@ -18,6 +18,7 @@
         Margin="10,10,0,0"
         HorizontalAlignment="Left"
         VerticalAlignment="Top"
+        Click="StartServer_Click"                
         Style="{DynamicResource SquareButtonStyle}">
             <iconPacks:PackIconFontAwesome Width="20" Height="20" Kind="PlaySolid" />
         </Button>
