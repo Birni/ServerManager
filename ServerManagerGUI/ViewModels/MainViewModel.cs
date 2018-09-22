@@ -17,6 +17,8 @@ namespace ServerManagerGUI.ViewModels
 
         public MainViewModel()
         {
+            ServerList.LoadFromFile();
+
             /* TODO: remove testing stuff */
             IServer server1 = new IServer("Ragnarok");
             ServerList.AddOrUpdateServer(server1);

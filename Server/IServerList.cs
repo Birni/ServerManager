@@ -5,6 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
+
 
 
 namespace Server
@@ -14,7 +18,7 @@ namespace Server
         private static IServerList mIServerList = null;
         private static readonly object padlock = new object();
         static ConcurrentDictionary<string, IServer> mServerList = new ConcurrentDictionary<string, IServer>();
-
+        private const string DATA_FILENAME = "ServerManagerData.dat";
 
         public static IServerList MIServerList
         {
@@ -53,6 +57,7 @@ namespace Server
                     mServerList.TryRemove(currentkey, out retrievedValue);
                 }
             }
+            SaveToFile();
         }
 
 
@@ -78,16 +83,48 @@ namespace Server
 
                         return existingVal;
                 });
-
+            SaveToFile();
         }
 
-
-        public bool UpdateServer(IServer name)
+        public void SaveToFile()
         {
-
-
-
-            return true; 
+            try
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                FileStream writerFileStream =
+                new FileStream(DATA_FILENAME, FileMode.Create, FileAccess.Write);
+                formatter.Serialize(writerFileStream, mServerList);
+                writerFileStream.Close();
+            }
+            catch (Exception)
+            {
+                /*TODO: no action planned ?*/
+                //  throw new ArgumentException("Unable to save our information");
+            }
         }
+
+        public void LoadFromFile()
+        {
+            if (true == File.Exists(DATA_FILENAME))
+            {
+
+                try
+                {
+                   BinaryFormatter formatter = new BinaryFormatter(); 
+                   FileStream readerFileStream = new FileStream(DATA_FILENAME,FileMode.Open, FileAccess.Read);
+                   mServerList = (ConcurrentDictionary<String, IServer>) formatter.Deserialize(readerFileStream);
+                   readerFileStream.Close();
+
+            }
+            catch (Exception)
+            {
+                /*TODO: no action planned ?*/
+                //  throw new ArgumentException("Can not load data from file");
+            }
+
+        } 
+
+        } 
     }
+
 }

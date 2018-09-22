@@ -4,6 +4,7 @@ using System.Text;
 
 namespace Server
 {
+   [Serializable]
    public class IServer : IEqualityComparer<IServer>
     {
         public string ServerName { get; set; }
