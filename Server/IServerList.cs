@@ -70,7 +70,7 @@ namespace Server
 
                         if (server != existingVal)
                         {
-                            throw new ArgumentException("Duplicate server names names are not allowed: {0}.", server.ServerName);
+                            /*TODO: hanlde Duplicate server names ?*/
                         }
                         existingVal.Map = server.Map;
                         existingVal.maxPlayer = server.maxPlayer;
@@ -83,6 +83,12 @@ namespace Server
 
                         return existingVal;
                 });
+            SaveToFile();
+        }
+
+        public void DeleteServer(IServer server)
+        {
+            mServerList.TryRemove(server.ServerName, out IServer retrievedValue);
             SaveToFile();
         }
 

@@ -12,37 +12,60 @@
 
     <Grid>
 
-
-        <Button Width="50"
-        Height="50"
-        Margin="10,10,0,0"
-        HorizontalAlignment="Left"
-        VerticalAlignment="Top"
-        Click="StartServer_Click"                
-        Style="{DynamicResource SquareButtonStyle}">
-            <iconPacks:PackIconFontAwesome Width="20" Height="20" Kind="PlaySolid" />
-        </Button>
-
-        <Button Width="50"
-        Height="50"
-        Margin="70,10,0,0"
-        HorizontalAlignment="Left"
-        VerticalAlignment="Top"
-        Click="StopServer_Click"
-        Style="{DynamicResource SquareButtonStyle}">
-            <iconPacks:PackIconFontAwesome Width="20" Height="20" Kind="StopSolid" />
-        </Button>
-
-        <Button Width="50"
-        Height="50"
-        Margin="130,10,0,0"
-        HorizontalAlignment="Left"
-        VerticalAlignment="Top"
-        Click="StopSettings_Click"
-        Style="{DynamicResource SquareButtonStyle}">
-            <iconPacks:PackIconFontAwesome Width="20" Height="20" Kind="CogSolid" />
-        </Button>
+        <Label x:Name="Label_ServerName" Height="50" Content="Server name:"  Margin="10,10,0,0" FontSize="22" HorizontalAlignment="Left" VerticalAlignment="Top" />
 
 
+        <Grid Margin="0,50,0,0" VerticalAlignment="Top">
+            <Button Width="50"
+                Height="50"
+                Margin="10,10,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Click="StartServer_Click"                
+                Style="{DynamicResource SquareButtonStyle}">
+                <iconPacks:PackIconFontAwesome Width="20" Height="20" Kind="PlaySolid" />
+            </Button>
+
+            <Button Width="50"
+                Height="50"
+                Margin="70,10,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Click="StopServer_Click"
+                Style="{DynamicResource SquareButtonStyle}">
+                <iconPacks:PackIconFontAwesome Width="20" Height="20" Kind="StopSolid" />
+            </Button>
+
+            <Button Width="50"
+                Height="50"
+                Margin="130,10,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Click="DeleteServer_Click"
+                Style="{DynamicResource SquareButtonStyle}">
+                <iconPacks:PackIconFontAwesome Width="20" Height="20" Kind="SaveSolid" />
+            </Button>
+
+            <Button Width="50"
+                Height="50"
+                Margin="190,10,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Click="StopSettings_Click"
+                Style="{DynamicResource SquareButtonStyle}">
+                <iconPacks:PackIconFontAwesome Width="20" Height="20" Kind="CogSolid" />
+            </Button>
+
+            <Button Width="50"
+                Height="50"
+                Margin="250,10,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Click="DeleteServer_Click"
+                Style="{DynamicResource SquareButtonStyle}">
+                <iconPacks:PackIconFontAwesome Width="20" Height="20" Kind="TrashSolid" />
+            </Button>
+
+        </Grid>
     </Grid>
 </UserControl>

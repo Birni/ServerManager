@@ -25,7 +25,13 @@ namespace ServerManagerGUI.Views
             mServer = server;
             _MainView = MainView;
 
-            InitializeComponent(); 
+            InitializeComponent();
+
+            if (null != server.ServerName)
+            {
+                Label_ServerName.Content = server.ServerName;
+            }
+
         }
 
         private async void StopServer_Click(object sender, RoutedEventArgs e)
@@ -54,8 +60,40 @@ namespace ServerManagerGUI.Views
 
         private void StartServer_Click(object sender, RoutedEventArgs e)
         {
-
+            /* TODO: add implementation */
         }
+
+        private void SaveServer_Click(object sender, RoutedEventArgs e)
+        {
+            /* TODO: add implementation */
+        }
+
+        private async void DeleteServer_Click(object sender, RoutedEventArgs e)
+        {
+            var metroWindow = (Application.Current.MainWindow as MetroWindow);
+
+
+            var mySettings = new MetroDialogSettings()
+            {
+                AnimateShow = true,
+                AffirmativeButtonText = "Yes",
+                NegativeButtonText = "No",
+                ColorScheme = metroWindow.MetroDialogOptions.ColorScheme
+            };
+
+
+            MessageDialogResult result = await metroWindow.ShowMessageAsync("Delete Server!", "Are you sure to delete the server?",
+                MessageDialogStyle.AffirmativeAndNegative, mySettings);
+
+            if (result == MessageDialogResult.Affirmative)
+            {
+                IServerList ServerList = new IServerList();
+
+                ServerList.DeleteServer(mServer);
+                _MainView.RefreshMenu();
+            }
+        }
+
 
         private void StopSettings_Click(object sender, RoutedEventArgs e)
         {
