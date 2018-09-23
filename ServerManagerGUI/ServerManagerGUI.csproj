@@ -179,6 +179,10 @@
       <Project>{0728bae3-d9f0-49c1-ab07-f06fa1c502a0}</Project>
       <Name>Server</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Steam\Steam.csproj">
+      <Project>{3f893dfe-b44b-484b-b425-b98c8703d3d2}</Project>
+      <Name>Steam</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

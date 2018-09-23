@@ -87,7 +87,7 @@ namespace ServerManagerGUI.Views
 
             if (result == MessageDialogResult.Affirmative)
             {
-                IServerList ServerList = new IServerList();
+                IServerList ServerList = IServerList.MIServerList;
 
                 ServerList.DeleteServer(mServer);
                 _MainView.RefreshMenu();

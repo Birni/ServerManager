@@ -17,7 +17,7 @@ namespace ServerManagerGUI.Views
         IServer mServer;
         MainViewModel _MainView;
 
-        IServerList ServerList = new IServerList();
+       // IServerList ServerList = ;
 
         public ServerSettingsPage(MainViewModel MainView , IServer server)
         {
@@ -53,13 +53,13 @@ namespace ServerManagerGUI.Views
 
                 if (TextBox_ServerName.Text == mServer.ServerName)
                 {
-                    ServerList.AddOrUpdateServer(mServer);
+                    IServerList.MIServerList.AddOrUpdateServer(mServer);
                 }
                 else
                 {
-                    ServerList.ChangeKey(mServer.ServerName, TextBox_ServerName.Text);
+                    IServerList.MIServerList.ChangeKey(mServer.ServerName, TextBox_ServerName.Text);
                     mServer.ServerName = TextBox_ServerName.Text;
-                    ServerList.AddOrUpdateServer(mServer);
+                    IServerList.MIServerList.AddOrUpdateServer(mServer);
                     /* Server name changed refresh menu */
                     _MainView.RefreshMenu();
                 }

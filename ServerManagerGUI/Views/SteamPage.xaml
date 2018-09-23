@@ -4,20 +4,83 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
       d:DesignHeight="300"
       d:DesignWidth="300"
       Style="{DynamicResource PageStyle}"
       mc:Ignorable="d">
 
     <Grid>
+        <Grid Height="68" VerticalAlignment="Top">
+            <Grid Height="68">
+                <Label Height="50" Content="Steam"  Style="{DynamicResource PageHeaderStyle}" />
+            </Grid>
 
         <iconPacks:PackIconFontAwesome Width="48"
-                                       Height="48"
-                                       Margin="10"
-                                       HorizontalAlignment="Right"
-                                       VerticalAlignment="Top"
-                                       Foreground="{DynamicResource AccentBaseColorBrush}"
-                                       Kind="SteamBrands" />
+                                           Height="48"
+                                           Margin="10"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Top"
+                                           Foreground="{DynamicResource AccentBaseColorBrush}"
+                                           Kind="SteamBrands" />
+        </Grid>
+        <Grid Margin="10,68,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />                
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+
+            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                <Label Content="Steam CMD Path:" Style="{DynamicResource DescriptionHeaderStyle}" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">
+                <TextBox x:Name="TextBox_SteamPath" Text="C:\SteamCMD\bin" TextChanged="TextBox_SteamPathChangedEventHandler" VerticalAlignment="Center" Margin="2,2,2,2">
+                    <TextBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="This is only a Test-Item" />
+                        </ContextMenu>
+                    </TextBox.ContextMenu>
+                </TextBox>
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">
+                <Label Content="Steam Login:" Style="{DynamicResource DescriptionHeaderStyle}" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Grid.Column="1" VerticalAlignment="Center">
+                <TextBox x:Name="TextBox_SteamLogin" Text="anonymous" TextChanged="TextBox_SteamLoginChangedEventHandler" VerticalAlignment="Center" Margin="2,2,2,2">
+                    <TextBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="This is only a Test-Item" />
+                        </ContextMenu>
+                    </TextBox.ContextMenu>
+                </TextBox>
+            </StackPanel>
+
+            <StackPanel Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">
+                <Label Content="Steam App ID:" Style="{DynamicResource DescriptionHeaderStyle}" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="2" Grid.Column="1" VerticalAlignment="Center">
+                <TextBox x:Name="TextBox_SteamAppID" Text="346110" TextChanged="TextBox_SteamAppIDChangedEventHandler" VerticalAlignment="Center" Margin="2,2,2,2">
+                    <TextBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="This is only a Test-Item" />
+                        </ContextMenu>
+                    </TextBox.ContextMenu>
+                </TextBox>
+            </StackPanel>
+
+
+
+        </Grid>
 
     </Grid>
 </UserControl>

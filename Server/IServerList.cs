@@ -20,6 +20,10 @@ namespace Server
         static ConcurrentDictionary<string, IServer> mServerList = new ConcurrentDictionary<string, IServer>();
         private const string DATA_FILENAME = "ServerManagerData.dat";
 
+        private IServerList()
+        {
+        }
+
         public static IServerList MIServerList
         {
             get
@@ -29,6 +33,7 @@ namespace Server
                     if (mIServerList == null)
                     {
                         mIServerList = new IServerList();
+                        mIServerList.LoadFromFile();
                     }
                     return mIServerList;
                 }

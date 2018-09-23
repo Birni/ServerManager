@@ -12,19 +12,21 @@ namespace ServerManagerGUI.ViewModels
         private HamburgerMenuItemCollection _menuItems;
         private HamburgerMenuItemCollection _menuOptionItems;
 
-        IServerList ServerList = new IServerList();
+   //     IServerList ServerList = IServerList.MIServerList;
 
 
         public MainViewModel()
         {
-            ServerList.LoadFromFile();
 
-            /* TODO: remove testing stuff */
-            IServer server1 = new IServer("Ragnarok");
-            ServerList.AddOrUpdateServer(server1);
 
-            IServer server2 = new IServer("awsome server");
-            ServerList.AddOrUpdateServer(server2);
+            ///* TODO: remove testing stuff */
+            //IServer server1 = new IServer("Ragnarok");
+            //ServerList.AddOrUpdateServer(server1);
+
+            //IServer server2 = new IServer("test");
+            ////ServerList.AddOrUpdateServer(server2);
+
+            //IServerList.MIServerList.AddOrUpdateServer(server2);
 
             CreateMenuItems();
         }
@@ -54,7 +56,7 @@ namespace ServerManagerGUI.ViewModels
                 }
             };
 
-            foreach (KeyValuePair<string, IServer> server in ServerList.GetserverList())
+            foreach (KeyValuePair<string, IServer> server in IServerList.MIServerList.GetserverList())
             {
 
                 MenuItems.Add(new HamburgerMenuIconItem()
