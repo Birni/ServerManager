@@ -60,7 +60,7 @@ namespace ServerManagerGUI.Views
 
         private void StartServer_Click(object sender, RoutedEventArgs e)
         {
-            /* TODO: add implementation */
+            mServer.StartAndUpdateServer();
         }
 
         private void SaveServer_Click(object sender, RoutedEventArgs e)

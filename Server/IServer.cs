@@ -1,6 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
+using Steam;
+using System.Threading;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using System.IO;
 
 namespace Server
 {
@@ -47,5 +53,40 @@ namespace Server
             IServer se = (IServer)obj;
             return se.ServerName.GetHashCode();
         }
+
+
+        public async Task<bool> StartServer()
+        {
+            if (Directory.Exists(this.ArkSurvivalFolder))
+            {
+                return await Task.Run(() =>
+                {
+                    Process pProcess = new Process();
+                    pProcess.StartInfo.FileName = this.ArkSurvivalFolder + "\\ShooterGame\\Binaries\\Win64\\ShooterGameServer.exe";
+                    pProcess.StartInfo.Arguments = this.ServerStartArgument +" ";
+                    pProcess.Start();
+                    pProcess.WaitForExit();
+                    pProcess.Close();
+                    return true;
+                });
+            }
+            return false;
+        }
+
+        public  void StartAndUpdateServer()
+        {
+            new Thread(async () =>
+            {
+                Thread.CurrentThread.IsBackground = true;
+                SteamCMDCall steamCMDCall = new SteamCMDCall();
+
+                var output = steamCMDCall.UpdateServer(this.ArkSurvivalFolder);
+                output.Wait();
+
+                await StartServer();
+
+            }).Start();
+        }
+
     }
 }

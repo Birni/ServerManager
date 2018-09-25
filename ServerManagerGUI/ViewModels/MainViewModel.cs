@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using ServerManagerGUI;
 using ServerManagerGUI.Views;
 using Server;
+using Rcon;
 
 namespace ServerManagerGUI.ViewModels
 {
@@ -12,12 +13,12 @@ namespace ServerManagerGUI.ViewModels
         private HamburgerMenuItemCollection _menuItems;
         private HamburgerMenuItemCollection _menuOptionItems;
 
-   //     IServerList ServerList = IServerList.MIServerList;
 
 
         public MainViewModel()
         {
 
+            RconTest();
 
             ///* TODO: remove testing stuff */
             //IServer server1 = new IServer("Ragnarok");
@@ -30,7 +31,30 @@ namespace ServerManagerGUI.ViewModels
 
             CreateMenuItems();
         }
-        
+
+        public async void RconTest()
+        {
+
+            INetworkSocket socket = new RconSocket();
+
+
+            RconMessenger messenger = new RconMessenger(socket);
+
+            bool isConnected = await messenger.ConnectAsync("185.38.149.15", 32330);
+
+            bool authenticated = await messenger.AuthenticateAsync("password");
+            if (authenticated)
+            {
+
+                var response = await messenger.ExecuteCommandAsync("listplayers");
+            }
+
+
+
+        }
+
+
+
         public void RefreshMenu()
         {
             CreateMenuItems();

@@ -175,6 +175,10 @@
     <Resource Include="Resources\Entypo-license.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Rcon\Rcon.csproj">
+      <Project>{2d630c21-754d-4d2d-93e2-0c7f5d4549ac}</Project>
+      <Name>Rcon</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Server\Server.csproj">
       <Project>{0728bae3-d9f0-49c1-ab07-f06fa1c502a0}</Project>
       <Name>Server</Name>

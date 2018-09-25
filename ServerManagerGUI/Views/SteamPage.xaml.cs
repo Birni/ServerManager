@@ -10,6 +10,7 @@ namespace ServerManagerGUI.Views
     /// </summary>
     public partial class SteamPage : UserControl
     {
+        /* this needs to lock the ChangedEventHandler when the components get initialize */
         private bool isInitialized = false;
 
         public SteamPage()

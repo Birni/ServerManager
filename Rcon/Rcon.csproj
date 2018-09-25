@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3F893DFE-B44B-484B-B425-B98C8703D3D2}</ProjectGuid>
+    <ProjectGuid>{2D630C21-754D-4D2D-93E2-0C7F5D4549AC}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Steam</RootNamespace>
-    <AssemblyName>Steam</AssemblyName>
+    <RootNamespace>Rcon</RootNamespace>
+    <AssemblyName>Rcon</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -40,12 +40,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SteamCMDCall.cs" />
-    <Compile Include="SteamCMDInterface.cs" />
+    <Compile Include="Extensions\IntExtensions.cs" />
+    <Compile Include="INetworkSocket.cs" />
+    <Compile Include="PacketType.cs" />
+    <Compile Include="RconMessenger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
+    <Compile Include="RconPacket.cs" />
+    <Compile Include="RconSocket.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
