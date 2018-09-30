@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27703.2035
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerManagerGUI", "ServerManagerGUI\ServerManagerGUI.csproj", "{E25E0DF3-C025-4402-87F0-24A6494D295E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "Server\Server.csproj", "{0728BAE3-D9F0-49C1-AB07-F06FA1C502A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArkServer", "Server\ArkServer.csproj", "{0728BAE3-D9F0-49C1-AB07-F06FA1C502A0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SteamWeb", "SteamWeb\SteamWeb.csproj", "{E73149B8-FDC0-48F0-B6B7-D40EA40C6499}"
 EndProject

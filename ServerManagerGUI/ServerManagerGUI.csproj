@@ -179,9 +179,13 @@
       <Project>{2d630c21-754d-4d2d-93e2-0c7f5d4549ac}</Project>
       <Name>Rcon</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Server\Server.csproj">
+    <ProjectReference Include="..\Server\ArkServer.csproj">
       <Project>{0728bae3-d9f0-49c1-ab07-f06fa1c502a0}</Project>
-      <Name>Server</Name>
+      <Name>ArkServer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SteamWeb\SteamWeb.csproj">
+      <Project>{e73149b8-fdc0-48f0-b6b7-d40ea40c6499}</Project>
+      <Name>SteamWeb</Name>
     </ProjectReference>
     <ProjectReference Include="..\Steam\Steam.csproj">
       <Project>{3f893dfe-b44b-484b-b425-b98c8703d3d2}</Project>

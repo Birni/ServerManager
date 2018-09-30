@@ -5,6 +5,7 @@ using ServerManagerGUI;
 using ServerManagerGUI.Views;
 using Server;
 using Rcon;
+using SteamWeb;
 
 namespace ServerManagerGUI.ViewModels
 {
@@ -19,6 +20,7 @@ namespace ServerManagerGUI.ViewModels
         {
 
             RconTest();
+            TestSteamRequest();
 
             ///* TODO: remove testing stuff */
             //IServer server1 = new IServer("Ragnarok");
@@ -31,6 +33,35 @@ namespace ServerManagerGUI.ViewModels
 
             CreateMenuItems();
         }
+
+        public async void TestSteamRequest()
+        {
+
+       //     var parameters = new List<SteamWebRequestParameter>();
+
+       //     parameters.Add(new SteamWebRequestParameter("itemcount", "1"));
+       //     parameters.Add(new SteamWebRequestParameter("publishedfileids[0]", "1373937944"));
+
+       //     // List<SteamWebRequestParameter> parameters = new List<SteamWebRequestParameter>();
+       //     // parameters.AddIfHasValue("publishedfileids[0]", "1373937944");
+
+
+       //     // this will map to the ISteamUser endpoint
+            var steamInterface = new SteamWebInterface("https://api.steampowered.com/" , "<secret>");
+            steamInterface.SteamWebGetPublishedFileDetails("1373937944");
+
+       //     await steamInterface.PostAsync<dynamic>("GetPublishedFileDetails",1, parameters);
+
+
+
+            ////     await steamInterface.PostAsync<dynamic>("GetPublishedFileDetails" , 1 , param);
+
+
+
+
+
+        }
+
 
         public async void RconTest()
         {
