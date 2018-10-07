@@ -3,7 +3,7 @@ using MahApps.Metro.IconPacks;
 using System.Collections.Generic;
 using ServerManagerGUI;
 using ServerManagerGUI.Views;
-using Server;
+using ArkServer;
 using Rcon;
 using SteamWeb;
 
@@ -23,13 +23,12 @@ namespace ServerManagerGUI.ViewModels
             TestSteamRequest();
 
             ///* TODO: remove testing stuff */
-            //IServer server1 = new IServer("Ragnarok");
-            //ServerList.AddOrUpdateServer(server1);
+            //Server server1 = new Server("Ragnarok");
 
-            //IServer server2 = new IServer("test");
+            //Server server2 = new Server("test");
             ////ServerList.AddOrUpdateServer(server2);
 
-            //IServerList.MIServerList.AddOrUpdateServer(server2);
+
 
             CreateMenuItems();
         }
@@ -111,7 +110,7 @@ namespace ServerManagerGUI.ViewModels
                 }
             };
 
-            foreach (KeyValuePair<string, IServer> server in IServerList.MIServerList.GetserverList())
+            foreach (KeyValuePair<string, Server> server in ServerCollection.MServerCollection.GetCollection())
             {
 
                 MenuItems.Add(new HamburgerMenuIconItem()
@@ -119,7 +118,7 @@ namespace ServerManagerGUI.ViewModels
                     Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.ServerSolid },
                     Label = server.Key,
                     ToolTip = server.Key + " settings.",
-                    Tag = new ServerPage(this , server.Value)
+                    Tag = new ServerPage(this, server.Value)
                 }
                 );
             }

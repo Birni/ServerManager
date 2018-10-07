@@ -7,7 +7,7 @@ using System.Windows.Controls;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using ServerManagerGUI.ViewModels;
-using Server;
+using ArkServer;
 
 namespace ServerManagerGUI.Views
 {
@@ -17,10 +17,10 @@ namespace ServerManagerGUI.Views
     /// 
     public partial class ServerPage : UserControl
     {
-        IServer mServer;
+        Server mServer;
         MainViewModel _MainView;
 
-        public ServerPage(MainViewModel MainView, IServer server)
+        public ServerPage(MainViewModel MainView, Server server)
         {
             mServer = server;
             _MainView = MainView;
@@ -87,9 +87,9 @@ namespace ServerManagerGUI.Views
 
             if (result == MessageDialogResult.Affirmative)
             {
-                IServerList ServerList = IServerList.MIServerList;
+               // ServerList ServerList = ServerList.MIServerList;
 
-                ServerList.DeleteServer(mServer);
+              //  ServerList.DeleteServer(mServer);
                 _MainView.RefreshMenu();
             }
         }
@@ -98,12 +98,14 @@ namespace ServerManagerGUI.Views
         private void StopSettings_Click(object sender, RoutedEventArgs e)
         {
 
-            Window window = new Window
-            {
-                Content = new ServerSettingsPage(_MainView, mServer)
-            };
 
-            window.ShowDialog();
+
+
+            var metroWindow = (Application.Current.MainWindow as MetroWindow);
+
+            metroWindow.Content = new ServerSettingsPage(_MainView, mServer);
+
+
 
         }
     }

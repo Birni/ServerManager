@@ -5,7 +5,7 @@ using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using ServerManagerGUI;
 using ServerManagerGUI.ViewModels;
-using Server;
+using ArkServer;
 
 namespace ServerManagerGUI.Views
 {
@@ -14,12 +14,12 @@ namespace ServerManagerGUI.Views
     /// </summary>
     public partial class ServerSettingsPage : UserControl 
     {
-        IServer mServer;
+        Server mServer;
         MainViewModel _MainView;
 
-       // IServerList ServerList = ;
+       // ServerList ServerList = ;
 
-        public ServerSettingsPage(MainViewModel MainView , IServer server)
+        public ServerSettingsPage(MainViewModel MainView , Server server)
         {
             mServer = server;
             _MainView = MainView;
@@ -37,11 +37,10 @@ namespace ServerManagerGUI.Views
 
 
 
-        private void ServerSettingsSave_Click(object sender, RoutedEventArgs e)
+        private async void ServerSettingsSave_Click(object sender, RoutedEventArgs e)
         {
-            if (TextBox_ServerName.Text != null)
+            if (!String.IsNullOrWhiteSpace(TextBox_ServerName.Text))
             {
-
                 mServer.ServerIp = TextBox_ServerIp.Text;
                 mServer.ArkSurvivalFolder = TextBox_ServerPath.Text;
                 mServer.Port = Int32.Parse(TextBox_ServerPort.Text);
@@ -49,27 +48,39 @@ namespace ServerManagerGUI.Views
                 mServer.RconPort = Int32.Parse(TextBox_ServerRconPort.Text);
                 mServer.ServerStartArgument = TextBox_ServerStartArgument.Text;
 
-
-
-                if (TextBox_ServerName.Text == mServer.ServerName)
+                if (mServer.ServerName != TextBox_ServerName.Text)
                 {
-                    IServerList.MIServerList.AddOrUpdateServer(mServer);
+                    if (ServerCollection.MServerCollection.IsAlreadyInCollection(TextBox_ServerName.Text))
+                    {
+                        var metroWindow = (Application.Current.MainWindow as MetroWindow);
+
+                        var mySettings = new MetroDialogSettings()
+                        {
+                            AnimateShow = true,
+                            AffirmativeButtonText = "OK",
+                            ColorScheme = metroWindow.MetroDialogOptions.ColorScheme
+                        };
+
+                        MessageDialogResult result = await metroWindow.ShowMessageAsync("Invalid server name !", "There is already a server named" + TextBox_ServerName.Text,
+                            MessageDialogStyle.Affirmative, mySettings);
+                    }
+                    else
+                    {
+                        mServer.DeliteSaveFile();
+                        ServerCollection.MServerCollection.RemoveServer(mServer);
+
+                        mServer.ServerName = TextBox_ServerName.Text;
+
+                        ServerCollection.MServerCollection.AddServer(mServer);
+
+                    }
                 }
                 else
                 {
-                    IServerList.MIServerList.ChangeKey(mServer.ServerName, TextBox_ServerName.Text);
-                    mServer.ServerName = TextBox_ServerName.Text;
-                    IServerList.MIServerList.AddOrUpdateServer(mServer);
-                    /* Server name changed refresh menu */
-                    _MainView.RefreshMenu();
+                    mServer.DeliteSaveFile();
+                    ServerCollection.MServerCollection.UpdateServer(mServer);
                 }
             }
-            else
-            {
-                throw new NotImplementedException();
-            }
-
-
         }
 
         private void ServerSettingsCancel_Click(object sender, RoutedEventArgs e)

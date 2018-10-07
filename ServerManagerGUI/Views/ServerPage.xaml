@@ -10,7 +10,7 @@
       Style="{DynamicResource PageStyle}"
       mc:Ignorable="d">
 
-    <Grid>
+    <Grid x:Name ="GridContent" >
 
         <Label x:Name="Label_ServerName" Height="50" Content="Server name:"  Style="{DynamicResource PageHeaderStyle}" />
 
