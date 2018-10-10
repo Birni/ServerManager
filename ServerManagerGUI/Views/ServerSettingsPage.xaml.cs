@@ -15,14 +15,12 @@ namespace ServerManagerGUI.Views
     public partial class ServerSettingsPage : UserControl 
     {
         Server mServer;
-        MainViewModel _MainView;
 
        // ServerList ServerList = ;
 
-        public ServerSettingsPage(MainViewModel MainView , Server server)
+        public ServerSettingsPage(Server server)
         {
             mServer = server;
-            _MainView = MainView;
 
             InitializeComponent();
 
@@ -85,7 +83,7 @@ namespace ServerManagerGUI.Views
 
         private void ServerSettingsCancel_Click(object sender, RoutedEventArgs e)
         {
-            Window.GetWindow(this).Close();
+            Navigation.Navigation.GoBack();
         }
     }
 }

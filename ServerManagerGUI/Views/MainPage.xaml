@@ -11,13 +11,23 @@
 
     <Grid>
 
-        <iconPacks:PackIconFontAwesome Width="48"
-                                       Height="48"
+        <iconPacks:PackIconFontAwesome Width="100"
+                                       Height="100"
                                        Margin="10"
-                                       HorizontalAlignment="Right"
-                                       VerticalAlignment="Top"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
                                        Foreground="{DynamicResource AccentBaseColorBrush}"
-                                       Kind="LemonSolid" />
+                                       Kind="ExclamationTriangleSolid" />
+
+
+        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" FontSize="22" Height="88" Margin="10,200,10,10">
+            
+            This product is in a early stage of development. <LineBreak/>
+            Expect majoir bugs.
+            
+        </TextBlock>
+        
+        
 
     </Grid>
 </UserControl>

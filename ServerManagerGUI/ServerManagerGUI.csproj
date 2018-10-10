@@ -81,9 +81,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ViewModels\MainViewModel.cs" />
-    <Compile Include="ViewModels\PropertyChangedViewModel.cs" />
-    <Compile Include="Views\SelectedItemToContentConverter.cs" />
+    <Compile Include="Navigation\Navigation.cs" />
+    <Compile Include="Nvvm\BindableBase.cs" />
+    <Compile Include="Nvvm\DelegateCommand.cs" />
+    <Compile Include="ViewModels\ViewModelBase.cs" />
+    <Compile Include="ViewModels\ShellViewModel.cs" />
+    <Compile Include="ViewModels\MenuItem.cs" />
     <Compile Include="Views\ServerSettingsPage.xaml.cs">
       <DependentUpon>ServerSettingsPage.xaml</DependentUpon>
     </Compile>

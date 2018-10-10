@@ -15,15 +15,13 @@ namespace ServerManagerGUI.Views
     /// Interaktionslogik für ServerPage.xaml
     /// </summary>
     /// 
-    public partial class ServerPage : UserControl
+    public partial class ServerPage : UserControl 
     {
         Server mServer;
-        MainViewModel _MainView;
 
-        public ServerPage(MainViewModel MainView, Server server)
+        public ServerPage(Server server)
         {
             mServer = server;
-            _MainView = MainView;
 
             InitializeComponent();
 
@@ -90,7 +88,7 @@ namespace ServerManagerGUI.Views
                // ServerList ServerList = ServerList.MIServerList;
 
               //  ServerList.DeleteServer(mServer);
-                _MainView.RefreshMenu();
+             //   _MainView.RefreshMenu();
             }
         }
 
@@ -98,15 +96,8 @@ namespace ServerManagerGUI.Views
         private void StopSettings_Click(object sender, RoutedEventArgs e)
         {
 
-
-
-
-            var metroWindow = (Application.Current.MainWindow as MetroWindow);
-
-            metroWindow.Content = new ServerSettingsPage(_MainView, mServer);
-
-
-
+           Navigation.Navigation.Navigate(new ServerSettingsPage(mServer));
         }
     }
 }
+

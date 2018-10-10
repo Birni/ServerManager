@@ -7,6 +7,7 @@
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                  xmlns:viewModels="clr-namespace:ServerManagerGUI.ViewModels"
                  xmlns:views="clr-namespace:ServerManagerGUI.Views"
+                 xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
                  Title="Salty Bay Server Manager"
                  Width="1200"
                  Height="800"
@@ -14,21 +15,29 @@
                  WindowTransitionsEnabled="False"
                  mc:Ignorable="d">
 
-    <Window.DataContext>
-        <viewModels:MainViewModel />
-    </Window.DataContext>
+
+
+    <mah:MetroWindow.DataContext>
+        <viewModels:ShellViewModel />
+    </mah:MetroWindow.DataContext>
+
+    <mah:MetroWindow.LeftWindowCommands>
+        <mah:WindowCommands ShowSeparators="False">
+            <Button x:Name="GoBackButton"
+                    Width="{Binding ElementName=HamburgerMenuControl, Path=CompactPaneLength}"
+                    Click="GoBack_OnClick">
+                <iconPacks:PackIconMaterial Kind="ArrowLeft" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Button>
+        </mah:WindowCommands>
+    </mah:MetroWindow.LeftWindowCommands>
 
     <Grid>
 
         <Grid.Resources>
 
-            <core:SelectedItemToContentConverter x:Key="SelectedItemToContentConverter" />
-
-            <!--  this is the template for the items (options too)  -->
-            <DataTemplate x:Key="MenuItemTemplate" DataType="{x:Type mah:HamburgerMenuIconItem}">
-                <Grid x:Name="RootGrid"
-                      Height="48"
-                      Background="Transparent">
+            <DataTemplate x:Key="MenuItemTemplate"
+                          DataType="{x:Type viewModels:MenuItem}">
+                <Grid Height="48">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="48" />
                         <ColumnDefinition />
@@ -36,60 +45,25 @@
                     <ContentControl Grid.Column="0"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
-                                    Content="{Binding Icon}"
-                                    Focusable="False" />
+                                    Focusable="False"
+                                    Content="{Binding Icon}" />
                     <TextBlock Grid.Column="1"
                                VerticalAlignment="Center"
                                FontSize="16"
-                               Text="{Binding Label}" />
+                               Text="{Binding Text}" />
                 </Grid>
-                <DataTemplate.Triggers>
-                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type mah:HamburgerMenu}}, Path=IsPaneOpen}" Value="False">
-                        <Setter TargetName="RootGrid" Property="ToolTip" Value="{Binding ToolTip, Mode=OneWay}" />
-                    </DataTrigger>
-                </DataTemplate.Triggers>
             </DataTemplate>
-
-            <!--  these are the templates for the view models 
-            <DataTemplate DataType="{x:Type viewModels:HomeViewModel}">
-                <views:HomeView DataContext="{Binding}" />
-            </DataTemplate>
-            <DataTemplate DataType="{x:Type viewModels:PrivateViewModel}">
-                <views:PrivateView DataContext="{Binding}" />
-            </DataTemplate>
-            <DataTemplate DataType="{x:Type viewModels:SettingsViewModel}">
-                <views:SettingsView DataContext="{Binding}" />
-            </DataTemplate>
-            <DataTemplate DataType="{x:Type viewModels:AboutViewModel}">
-                <views:AboutView DataContext="{Binding}" />
-            </DataTemplate> -->
 
         </Grid.Resources>
 
         <mah:HamburgerMenu x:Name="HamburgerMenuControl"
-                           DisplayMode="CompactInline"
-                           IsPaneOpen="False"
-                           ItemTemplate="{StaticResource MenuItemTemplate}"
-                           ItemsSource="{Binding MenuItems}"
-                           OptionsItemTemplate="{StaticResource MenuItemTemplate}"
-                           OptionsItemsSource="{Binding MenuOptionItems}"
-                           SelectedIndex="0">
-
-            <!--  select the tag (ViewModel) of the selected item (options item)  -->
-            <mah:HamburgerMenu.Content>
-                <MultiBinding Converter="{StaticResource SelectedItemToContentConverter}">
-                    <Binding FallbackValue="{x:Null}"
-                             Mode="OneWay"
-                             Path="SelectedItem.Tag"
-                             RelativeSource="{RelativeSource Self}" />
-                    <Binding FallbackValue="{x:Null}"
-                             Mode="OneWay"
-                             Path="SelectedOptionsItem.Tag"
-                             RelativeSource="{RelativeSource Self}" />
-                </MultiBinding>
-            </mah:HamburgerMenu.Content>
-
-        </mah:HamburgerMenu>
+                                IsPaneOpen="False"
+                                ItemsSource="{Binding Menu}"
+                                OptionsItemsSource="{Binding OptionsMenu}"
+                                ItemInvoked="HamburgerMenuControl_OnItemInvoked"
+                                ItemTemplate="{StaticResource MenuItemTemplate}"
+                                OptionsItemTemplate="{StaticResource MenuItemTemplate}"
+                                DisplayMode="CompactInline" />
 
     </Grid>
 </mah:MetroWindow>
