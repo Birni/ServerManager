@@ -4,11 +4,11 @@ using System.Text;
 
 namespace ArkServer.Logging
 {
-    interface LogData
+    public class LogData
     {
-        DateTime LogTime { get; set; }
-        LogType  LogType { get; set; }
-        string LogMessage { get; set; }
+       public  DateTime LogTime { get; set; }
+       public LogType  LogType { get; set; }
+       public string LogMessage { get; set; }
     }
 
 }

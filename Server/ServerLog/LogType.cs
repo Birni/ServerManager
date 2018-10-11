@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ArkServer.Logging
 {
-    enum LogType
+    public enum LogType
     {
         Information = 0,
         Critical = 1,

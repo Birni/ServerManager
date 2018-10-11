@@ -42,7 +42,7 @@ namespace ArkServer
                 ArkSurvivalFolder = SavedData.ArkSurvivalFolder;
                 Map = SavedData.Map;
                 ServerIp = SavedData.ServerIp;
-                ServerStartArgument = SavedData.ServerName;
+                ServerStartArgument = SavedData.ServerStartArgument;
                 QueryPort = SavedData.QueryPort;
                 Port = SavedData.Port;
                 RconPort = SavedData.RconPort;
@@ -53,6 +53,8 @@ namespace ArkServer
                 {
                     this.Delete();
                 }
+
+                logs = new ServerLog(ServerName);
 
             }
 
@@ -74,7 +76,9 @@ namespace ArkServer
             {
                 SaveToFile(); /* save in file  */
                 this.Delete(); /* server is now saved in the server collection -> delete this temp server */
-            }            
+            }
+
+            logs = new ServerLog(ServerName);
         }
 
         public void Delete()
