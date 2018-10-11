@@ -15,21 +15,28 @@ namespace ServerManagerGUI.Views
     /// Interaktionslogik für ServerPage.xaml
     /// </summary>
     /// 
-    public partial class ServerPage : UserControl 
+    partial class ServerPage : UserControl 
     {
-        Server mServer;
+        Server mServer = null;
+        ShellViewModel mShellViewModel = null;
 
-        public ServerPage(Server server)
+        internal ServerPage(ShellViewModel ShellViewModel , Server server)
         {
             mServer = server;
+            mShellViewModel = ShellViewModel;
 
             InitializeComponent();
 
-            if (null != server.ServerName)
+            if (null != mServer.ServerName)
             {
                 Label_ServerName.Content = server.ServerName;
             }
 
+        }
+
+        void OnLoad(object sender, RoutedEventArgs e)
+        {
+            Label_ServerName.Content = mServer.ServerName;
         }
 
         private async void StopServer_Click(object sender, RoutedEventArgs e)
@@ -85,10 +92,12 @@ namespace ServerManagerGUI.Views
 
             if (result == MessageDialogResult.Affirmative)
             {
-               // ServerList ServerList = ServerList.MIServerList;
+                mServer.DeliteSaveFile();
+                ServerCollection.MServerCollection.RemoveServer(mServer);
+                mServer.Delete();
+                mShellViewModel.RefreshMenu();
+                Navigation.Navigation.Navigate(new Uri("Views/MainPage.xaml", UriKind.RelativeOrAbsolute));
 
-              //  ServerList.DeleteServer(mServer);
-             //   _MainView.RefreshMenu();
             }
         }
 
@@ -96,7 +105,7 @@ namespace ServerManagerGUI.Views
         private void StopSettings_Click(object sender, RoutedEventArgs e)
         {
 
-           Navigation.Navigation.Navigate(new ServerSettingsPage(mServer));
+           Navigation.Navigation.Navigate(new ServerSettingsPage(mShellViewModel , mServer));
         }
     }
 }

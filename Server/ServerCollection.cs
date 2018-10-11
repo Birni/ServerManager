@@ -65,7 +65,14 @@ namespace ArkServer
 
         public bool IsAlreadyInCollection(string servername)
         {
-            return Collection.TryGetValue(servername, out Server server);
+            if (!string.IsNullOrWhiteSpace(servername))
+            {
+                return Collection.TryGetValue(servername, out Server server);
+            }
+            else
+            {
+                return true;
+            }
         }
 
         public void UpdateServer(Server server)

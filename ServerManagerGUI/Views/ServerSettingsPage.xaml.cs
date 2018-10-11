@@ -12,15 +12,17 @@ namespace ServerManagerGUI.Views
     /// <summary>
     /// Interaktionslogik für ServerSettingsPage.xaml
     /// </summary>
-    public partial class ServerSettingsPage : UserControl 
+    partial class ServerSettingsPage : UserControl 
     {
         Server mServer;
+        ShellViewModel mShellViewModel = null;
 
-       // ServerList ServerList = ;
+        // ServerList ServerList = ;
 
-        public ServerSettingsPage(Server server)
+        internal ServerSettingsPage(ShellViewModel ShellViewModel ,  Server server)
         {
             mServer = server;
+            mShellViewModel = ShellViewModel;
 
             InitializeComponent();
 
@@ -64,21 +66,26 @@ namespace ServerManagerGUI.Views
                     }
                     else
                     {
+                        /* save file is named like the server ? server renamed -> new save file  */ 
                         mServer.DeliteSaveFile();
                         ServerCollection.MServerCollection.RemoveServer(mServer);
 
                         mServer.ServerName = TextBox_ServerName.Text;
 
                         ServerCollection.MServerCollection.AddServer(mServer);
-
+                        mServer.SaveToFile();
+                        /* Server name changed -> refresh menu items */
+                        mShellViewModel.RefreshMenu();
                     }
                 }
                 else
                 {
-                    mServer.DeliteSaveFile();
+                    mServer.SaveToFile();
                     ServerCollection.MServerCollection.UpdateServer(mServer);
+
                 }
             }
+            Navigation.Navigation.GoBack();
         }
 
         private void ServerSettingsCancel_Click(object sender, RoutedEventArgs e)

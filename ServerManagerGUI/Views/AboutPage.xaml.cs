@@ -11,6 +11,9 @@ namespace ServerManagerGUI.Views
         public AboutPage()
         {
             InitializeComponent();
+
+
+
         }
     }
 }

@@ -18,6 +18,7 @@ namespace ServerManagerGUI
         {
             InitializeComponent();
 
+
             Navigation.Navigation.Frame = new Frame() { NavigationUIVisibility = NavigationUIVisibility.Hidden };
             Navigation.Navigation.Frame.Navigated += SplitViewFrame_OnNavigated;
 

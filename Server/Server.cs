@@ -72,12 +72,9 @@ namespace ArkServer
 
             if (ServerCollection.MServerCollection.AddServer(this))
             {
-                this.Delete();
-            }
-            else
-            {
-                SaveToFile();
-            }
+                SaveToFile(); /* save in file  */
+                this.Delete(); /* server is now saved in the server collection -> delete this temp server */
+            }            
         }
 
         public void Delete()
@@ -93,7 +90,7 @@ namespace ArkServer
         }
 
 
-        private void SaveToFile()
+        public void SaveToFile()
         {
             if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "\\"+ SaveFolderName))
             {

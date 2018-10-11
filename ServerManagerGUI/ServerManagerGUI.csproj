@@ -87,6 +87,9 @@
     <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
     <Compile Include="ViewModels\MenuItem.cs" />
+    <Compile Include="Views\NewServerPage.xaml.cs">
+      <DependentUpon>NewServerPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\ServerSettingsPage.xaml.cs">
       <DependentUpon>ServerSettingsPage.xaml</DependentUpon>
     </Compile>
@@ -123,6 +126,10 @@
     <Page Include="Resources\Icons.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\NewServerPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ServerSettingsPage.xaml">
       <Generator>MSBuild:Compile</Generator>
