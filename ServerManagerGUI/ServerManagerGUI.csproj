@@ -8,11 +8,12 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>ServerManagerGUI</RootNamespace>
     <AssemblyName>ServerManagerGUI</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -194,13 +195,13 @@
     <Resource Include="Resources\Entypo-license.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ArkServer\ArkServer.csproj">
+      <Project>{c00dad98-4fad-43a8-b56b-7464102128e4}</Project>
+      <Name>ArkServer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Rcon\Rcon.csproj">
       <Project>{2d630c21-754d-4d2d-93e2-0c7f5d4549ac}</Project>
       <Name>Rcon</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Server\ArkServer.csproj">
-      <Project>{0728bae3-d9f0-49c1-ab07-f06fa1c502a0}</Project>
-      <Name>ArkServer</Name>
     </ProjectReference>
     <ProjectReference Include="..\SteamWeb\SteamWeb.csproj">
       <Project>{e73149b8-fdc0-48f0-b6b7-d40ea40c6499}</Project>

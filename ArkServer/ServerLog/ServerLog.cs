@@ -1,7 +1,16 @@
 ﻿using System;
+using System.Windows;
+using System.Threading;
+using System.Threading.Tasks;
+
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
+using System.Windows.Threading;
+
+
 
 namespace ArkServer.Logging
 {
@@ -11,10 +20,14 @@ namespace ArkServer.Logging
         private static readonly string DataFormat = ".log";
 
         private readonly string datetimeFormat;
+        private Dispatcher dispatcher = Dispatcher.CurrentDispatcher;
         string logFilename;
         string fullfilename;
         StreamWriter file = null;
-        List<LogData> logs = null;  
+       // List<LogData> logs = null;
+        int currentlogId = 0;
+
+        public ObservableCollection<LogData> logs { get; } = new ObservableCollection<LogData>();
 
         public ServerLog(string Filename)
         {
@@ -28,9 +41,14 @@ namespace ArkServer.Logging
             this.logFilename = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, FolderName);
             this.fullfilename = Filename + System.DateTime.Now.ToString(datetimeFormat) + DataFormat;
 
-             logs = new List<LogData>();
+           //  logs = new List<LogData>();
 
         }
+        public ObservableCollection<LogData> GetLogs()
+        {
+            return logs;
+        }
+
 
         string GenerateLogString(LogData data)
         {
@@ -40,13 +58,16 @@ namespace ArkServer.Logging
 
         public void LogServerInformation(string text)
         {
-            LogData infoLog = new LogData();
+            LogData infoLog = new LogData
+            {
+                LodId = ++currentlogId,
+                LogMessage = text,
+                LogTime = DateTime.Now,
+                LogType = LogType.Information
+            };
 
-            infoLog.LogMessage = text;
-            infoLog.LogTime = DateTime.Now;
-            infoLog.LogType = LogType.Information;
-
-            this.logs.Add(infoLog);
+            Action action = () => { logs.Add(infoLog); };
+            dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(action));
 
             file = new StreamWriter(Path.Combine(logFilename, fullfilename), true);
             file.WriteLine(GenerateLogString(infoLog));
@@ -55,13 +76,16 @@ namespace ArkServer.Logging
 
         public void LogServerCritical(string text)
         {
-            LogData infoLog = new LogData();
+            LogData infoLog = new LogData
+            {
+                LodId = ++currentlogId,
+                LogMessage = text,
+                LogTime = DateTime.Now,
+                LogType = LogType.Critical
+            };
 
-            infoLog.LogMessage = text;
-            infoLog.LogTime = DateTime.Now;
-            infoLog.LogType = LogType.Critical;
-
-            this.logs.Add(infoLog);
+            Action action = () => { logs.Add(infoLog); };
+            dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(action));
             file = new StreamWriter(Path.Combine(logFilename, fullfilename), true);
             file.WriteLine(GenerateLogString(infoLog));
             file.Close();
@@ -69,13 +93,16 @@ namespace ArkServer.Logging
 
         public void LogServerDeveloper(string text)
         {
-            LogData infoLog = new LogData();
+            LogData infoLog = new LogData
+            {
+                LodId = ++currentlogId,
+                LogMessage = text,
+                LogTime = DateTime.Now,
+                LogType = LogType.Developer
+            };
 
-            infoLog.LogMessage = text;
-            infoLog.LogTime = DateTime.Now;
-            infoLog.LogType = LogType.Developer;
-
-            this.logs.Add(infoLog);
+            Action action = () => { logs.Add(infoLog); };
+            dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(action));
             file = new StreamWriter(Path.Combine(logFilename, fullfilename), true);
             file.WriteLine(GenerateLogString(infoLog));
             file.Close();
@@ -83,13 +110,16 @@ namespace ArkServer.Logging
 
         public void LogServerError(string text)
         {
-            LogData infoLog = new LogData();
+            LogData infoLog = new LogData
+            {
+                LodId = ++currentlogId,
+                LogMessage = text,
+                LogTime = DateTime.Now,
+                LogType = LogType.Error
+            };
 
-            infoLog.LogMessage = text;
-            infoLog.LogTime = DateTime.Now;
-            infoLog.LogType = LogType.Error;
-
-            this.logs.Add(infoLog);
+            Action action = () => { logs.Add(infoLog); };
+            dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(action));
             file = new StreamWriter(Path.Combine(logFilename, fullfilename), true);
             file.WriteLine(GenerateLogString(infoLog));
             file.Close();

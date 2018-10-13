@@ -27,16 +27,21 @@ namespace ServerManagerGUI.Views
 
             InitializeComponent();
 
-            if (null != mServer.ServerName)
+            if (!string.IsNullOrWhiteSpace( mServer.ServerName))
             {
                 Label_ServerName.Content = server.ServerName;
             }
 
+            
         }
 
         void OnLoad(object sender, RoutedEventArgs e)
         {
             Label_ServerName.Content = mServer.ServerName;
+            
+            LogGrid.Items.Refresh();
+            LogGrid.ItemsSource = mServer.logs.GetLogs();
+
         }
 
         private async void StopServer_Click(object sender, RoutedEventArgs e)

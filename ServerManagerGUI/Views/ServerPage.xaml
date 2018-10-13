@@ -11,6 +11,11 @@
       mc:Ignorable="d"
       Loaded="OnLoad">
 
+    <!--<UserControl.Resources>
+        <ArkServerLog:ServerLog x:Key="Logs"/>
+    </UserControl.Resources>-->
+
+
     <Grid x:Name ="GridContent" >
 
         <Label x:Name="Label_ServerName" Height="50" Content="Server name:"  Style="{DynamicResource PageHeaderStyle}" />
@@ -42,7 +47,7 @@
                 Margin="130,10,0,0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
-                Click="DeleteServer_Click"
+                Click="SaveServer_Click"
                 Style="{DynamicResource SquareButtonStyle}">
                 <iconPacks:PackIconFontAwesome Width="20" Height="20" Kind="SaveSolid" />
             </Button>
@@ -68,5 +73,30 @@
             </Button>
 
         </Grid>
+
+
+
+        <DataGrid x:Name="LogGrid"
+                  Margin="0,150,0,0"
+                  Grid.Row="3"
+                  Grid.Column="1"
+                  AutoGenerateColumns="False"
+                  RowHeaderWidth="0"
+                  Style="{DynamicResource AzureDataGrid}"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  CanUserReorderColumns="False"
+                  CanUserResizeColumns="False"
+                  AreRowDetailsFrozen="True"
+                  IsReadOnly="True">
+            
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding LogTime}" Header="Date" />
+                <DataGridTextColumn Binding="{Binding LogType}" Header="Type" />
+                <DataGridTextColumn Binding="{Binding LogMessage}" Header="Message" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+
     </Grid>
 </UserControl>

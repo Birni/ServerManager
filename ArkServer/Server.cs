@@ -30,7 +30,7 @@ namespace ArkServer
         public int maxPlayer { get; set; }
 
 
-        [NonSerialized()] private ServerLog logs = null;
+        [NonSerialized()] public ServerLog logs = null; 
 
         public Server(FileInfo file)
         {
