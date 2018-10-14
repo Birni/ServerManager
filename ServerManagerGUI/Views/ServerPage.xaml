@@ -4,99 +4,261 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
-      d:DesignHeight="300"
-      d:DesignWidth="300"
-      Style="{DynamicResource PageStyle}"
+      xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+      xmlns:Views="clr-namespace:ServerManagerGUI.Views"
+      d:DesignHeight="500"
+      d:DesignWidth="800"
       mc:Ignorable="d"
       Loaded="OnLoad">
 
-    <!--<UserControl.Resources>
-        <ArkServerLog:ServerLog x:Key="Logs"/>
-    </UserControl.Resources>-->
-
-
-    <Grid x:Name ="GridContent" >
+    <Grid x:Name ="GridContent" Margin="2" >
 
         <Label x:Name="Label_ServerName" Height="50" Content="Server name:"  Style="{DynamicResource PageHeaderStyle}" />
 
+        <Controls:MetroAnimatedTabControl Margin="5,75,5,5" 
+                     Controls:TabControlHelper.Underlined="TabItems"
+                    >
+            <TabItem Header="Overview">
+                <Grid Margin="2,10,2,2">
+                    <Grid Height="100" VerticalAlignment="Top">
+                        <Border BorderBrush="{DynamicResource AccentColorBrush}" Margin="2" BorderThickness="2">
+                            <Grid>
+                            <Grid VerticalAlignment="Bottom" Width="auto" HorizontalAlignment="Left">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
 
-        <Grid Margin="0,50,0,0" VerticalAlignment="Top">
-            <Button Width="50"
-                Height="50"
-                Margin="10,10,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Click="StartServer_Click"                
-                Style="{DynamicResource SquareButtonStyle}">
-                <iconPacks:PackIconFontAwesome Width="20" Height="20" Kind="PlaySolid" />
-            </Button>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <Label Content="Status:" Style="{DynamicResource DescriptionHeaderStyle}" />
+                                </StackPanel>
 
-            <Button Width="50"
-                Height="50"
-                Margin="70,10,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Click="StopServer_Click"
-                Style="{DynamicResource SquareButtonStyle}">
-                <iconPacks:PackIconFontAwesome Width="20" Height="20" Kind="StopSolid" />
-            </Button>
+                                <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">
+                                        <Label x:Name="Label_Status" Content="Running" DataContextChanged="StatusDataChanged" Style="{DynamicResource DescriptionHeaderStyle}" />
+                                </StackPanel>
+                            </Grid>
 
-            <Button Width="50"
-                Height="50"
-                Margin="130,10,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Click="SaveServer_Click"
-                Style="{DynamicResource SquareButtonStyle}">
-                <iconPacks:PackIconFontAwesome Width="20" Height="20" Kind="SaveSolid" />
-            </Button>
+                            <Grid VerticalAlignment="Bottom" Width="auto" HorizontalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
 
-            <Button Width="50"
-                Height="50"
-                Margin="190,10,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Click="StopSettings_Click"
-                Style="{DynamicResource SquareButtonStyle}">
-                <iconPacks:PackIconFontAwesome Width="20" Height="20" Kind="CogSolid" />
-            </Button>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                        <Label Content="Version:" Style="{DynamicResource DescriptionHeaderStyle}" />
+                                </StackPanel>
 
-            <Button Width="50"
-                Height="50"
-                Margin="250,10,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Click="DeleteServer_Click"
-                Style="{DynamicResource SquareButtonStyle}">
-                <iconPacks:PackIconFontAwesome Width="20" Height="20" Kind="TrashSolid" />
-            </Button>
+                                <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">
+                                        <Label x:Name="Version" Content="unknown"  Style="{DynamicResource DescriptionHeaderStyle}" />
+                                </StackPanel>
+                            </Grid>
+                          </Grid>
 
-        </Grid>
+                        </Border>
+                    </Grid>
+                    <Border BorderBrush="{DynamicResource AccentColorBrush}" Margin="2,110,2,2" BorderThickness="2">
+                        <Grid Margin="0,0,0,0">
+                            <DataGrid x:Name="LogGrid"
+                      AutoGenerateColumns="False"
+                      RowHeaderWidth="0"
+                      Style="{DynamicResource AzureDataGrid}"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      CanUserReorderColumns="False"
+                      CanUserResizeColumns="False"
+                      AreRowDetailsFrozen="True"
+                      IsReadOnly="True" Grid.ColumnSpan="2">
+
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Binding="{Binding LogTime}" Header="Date" />
+                                    <DataGridTextColumn Binding="{Binding LogType}" Header="Type" />
+                                    <DataGridTextColumn Binding="{Binding LogMessage}" Header="Message" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Controls">
+                <Grid Margin="0,50,0,0" VerticalAlignment="Top">
+                    <Button Width="50"
+                        Height="50"
+                        Margin="10,10,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Click="StartServer_Click"                
+                        Style="{DynamicResource SquareButtonStyle}">
+                        <iconPacks:PackIconFontAwesome Width="20" Height="20" Kind="PlaySolid" />
+                    </Button>
+
+                    <Button Width="50"
+                        Height="50"
+                        Margin="70,10,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Click="StopServer_Click"
+                        Style="{DynamicResource SquareButtonStyle}">
+                        <iconPacks:PackIconFontAwesome Width="20" Height="20" Kind="StopSolid" />
+                    </Button>
+
+                    <Button Width="50"
+                        Height="50"
+                        Margin="130,10,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Click="SaveServer_Click"
+                        Style="{DynamicResource SquareButtonStyle}">
+                        <iconPacks:PackIconFontAwesome Width="20" Height="20" Kind="SaveSolid" />
+                    </Button>
+
+                    <Button Width="50"
+                        Height="50"
+                        Margin="190,10,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Click="DeleteServer_Click"
+                        Style="{DynamicResource SquareButtonStyle}">
+                        <iconPacks:PackIconFontAwesome Width="20" Height="20" Kind="TrashSolid" />
+                    </Button>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Settings">
+                <Grid Margin="10,10,10,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <Label Content="Server name:" Style="{DynamicResource DescriptionHeaderStyle}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">
+                        <TextBox x:Name="TextBox_ServerName" Text="awesome server" VerticalAlignment="Center" Margin="2,2,2,2">
+                            <TextBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="This is only a Test-Item" />
+                                </ContextMenu>
+                            </TextBox.ContextMenu>
+                        </TextBox>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">
+                        <Label Content="Path to Server:" Style="{DynamicResource DescriptionHeaderStyle}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" Grid.Column="1" VerticalAlignment="Center">
+                        <TextBox x:Name="TextBox_ServerPath" Text="Path to Server" VerticalAlignment="Center" Margin="2,2,2,2">
+                            <TextBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="This is only a Test-Item" />
+                                </ContextMenu>
+                            </TextBox.ContextMenu>
+                        </TextBox>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">
+                        <Label Content="Server Ip:" Style="{DynamicResource DescriptionHeaderStyle}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2" Grid.Column="1" VerticalAlignment="Center">
+                        <TextBox x:Name="TextBox_ServerIp" Text="185.38.149.15" VerticalAlignment="Center" Margin="2,2,2,2">
+                            <TextBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="This is only a Test-Item" />
+                                </ContextMenu>
+                            </TextBox.ContextMenu>
+                        </TextBox>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="3" Grid.Column="0" VerticalAlignment="Center">
+                        <Label Content="Server Querryport:" Style="{DynamicResource DescriptionHeaderStyle}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="3" Grid.Column="1" VerticalAlignment="Center">
+                        <TextBox x:Name="TextBox_ServerQuerryPort" Text="37015" VerticalAlignment="Center" Margin="2,2,2,2">
+                            <TextBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="This is only a Test-Item" />
+                                </ContextMenu>
+                            </TextBox.ContextMenu>
+                        </TextBox>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="4" Grid.Column="0" VerticalAlignment="Center">
+                        <Label Content="Server RconPort:" Style="{DynamicResource DescriptionHeaderStyle}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="4" Grid.Column="1" VerticalAlignment="Center">
+                        <TextBox x:Name="TextBox_ServerRconPort" Text="37016" VerticalAlignment="Center" Margin="2,2,2,2">
+                            <TextBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="This is only a Test-Item" />
+                                </ContextMenu>
+                            </TextBox.ContextMenu>
+                        </TextBox>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="5" Grid.Column="0" VerticalAlignment="Center">
+                        <Label Content="Server Port:" Style="{DynamicResource DescriptionHeaderStyle}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="5" Grid.Column="1" VerticalAlignment="Center">
+                        <TextBox x:Name="TextBox_ServerPort" Text="9999" VerticalAlignment="Center" Margin="2,2,2,2">
+                            <TextBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="This is only a Test-Item" />
+                                </ContextMenu>
+                            </TextBox.ContextMenu>
+                        </TextBox>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="6" Grid.Column="0" VerticalAlignment="Center">
+                        <Label Content="Start argment:" Style="{DynamicResource DescriptionHeaderStyle}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="6" Grid.Column="1" VerticalAlignment="Center">
+                        <TextBox x:Name="TextBox_ServerStartArgument" Text="Ragnarok?QueryPort=27015?MultiHome=185.38.149.15?RCONEnabled=true?RCONPort=32330?MaxPlayers=120?TribeLogDestroyedEnemyStructures=true?Port=7777?UseOptimizedHarvestingHealth=true?ForceAllStructureLocking=true?ServerCrosshair=True?listen -ClusterDirOverride=C:\SERVER\Ark_ServerX10\clusters -NoTransferFromFiltering -clusterid=2017ARK -automanagedmods -UseBattlEye -nosteamclient -AutoDestroyStructures -game -server -ForceRespawnDinos -log -servergamelog -servergamelogincludetribelogs " VerticalAlignment="Center" Margin="2,2,2,2">
+                            <TextBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="This is only a Test-Item" />
+                                </ContextMenu>
+                            </TextBox.ContextMenu>
+                        </TextBox>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="7" Grid.Column="1" VerticalAlignment="Center">
+                        <Grid Margin="10,10,10,10">
+                            <Button Click="ServerSettingsSave_Click" Content="Save" HorizontalAlignment="Right" Width="75"  Margin="0,0,0,0"/>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
 
 
+            </TabItem>
 
-        <DataGrid x:Name="LogGrid"
-                  Margin="0,150,0,0"
-                  Grid.Row="3"
-                  Grid.Column="1"
-                  AutoGenerateColumns="False"
-                  RowHeaderWidth="0"
-                  Style="{DynamicResource AzureDataGrid}"
-                  CanUserAddRows="False"
-                  CanUserDeleteRows="False"
-                  CanUserReorderColumns="False"
-                  CanUserResizeColumns="False"
-                  AreRowDetailsFrozen="True"
-                  IsReadOnly="True">
-            
-            <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding LogTime}" Header="Date" />
-                <DataGridTextColumn Binding="{Binding LogType}" Header="Type" />
-                <DataGridTextColumn Binding="{Binding LogMessage}" Header="Message" />
-            </DataGrid.Columns>
-        </DataGrid>
 
+        </Controls:MetroAnimatedTabControl>
 
     </Grid>
 </UserControl>

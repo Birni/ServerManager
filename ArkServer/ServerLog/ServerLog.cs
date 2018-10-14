@@ -24,8 +24,7 @@ namespace ArkServer.Logging
         string logFilename;
         string fullfilename;
         StreamWriter file = null;
-       // List<LogData> logs = null;
-        int currentlogId = 0;
+
 
         public ObservableCollection<LogData> logs { get; } = new ObservableCollection<LogData>();
 
@@ -41,8 +40,6 @@ namespace ArkServer.Logging
             this.logFilename = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, FolderName);
             this.fullfilename = Filename + System.DateTime.Now.ToString(datetimeFormat) + DataFormat;
 
-           //  logs = new List<LogData>();
-
         }
         public ObservableCollection<LogData> GetLogs()
         {
@@ -56,70 +53,18 @@ namespace ArkServer.Logging
         }
 
 
-        public void LogServerInformation(string text)
+        public void AddLog(LogType type, string text)
         {
             LogData infoLog = new LogData
             {
-                LodId = ++currentlogId,
                 LogMessage = text,
                 LogTime = DateTime.Now,
-                LogType = LogType.Information
+                LogType = type
             };
 
             Action action = () => { logs.Add(infoLog); };
             dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(action));
 
-            file = new StreamWriter(Path.Combine(logFilename, fullfilename), true);
-            file.WriteLine(GenerateLogString(infoLog));
-            file.Close();
-        }
-
-        public void LogServerCritical(string text)
-        {
-            LogData infoLog = new LogData
-            {
-                LodId = ++currentlogId,
-                LogMessage = text,
-                LogTime = DateTime.Now,
-                LogType = LogType.Critical
-            };
-
-            Action action = () => { logs.Add(infoLog); };
-            dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(action));
-            file = new StreamWriter(Path.Combine(logFilename, fullfilename), true);
-            file.WriteLine(GenerateLogString(infoLog));
-            file.Close();
-        }
-
-        public void LogServerDeveloper(string text)
-        {
-            LogData infoLog = new LogData
-            {
-                LodId = ++currentlogId,
-                LogMessage = text,
-                LogTime = DateTime.Now,
-                LogType = LogType.Developer
-            };
-
-            Action action = () => { logs.Add(infoLog); };
-            dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(action));
-            file = new StreamWriter(Path.Combine(logFilename, fullfilename), true);
-            file.WriteLine(GenerateLogString(infoLog));
-            file.Close();
-        }
-
-        public void LogServerError(string text)
-        {
-            LogData infoLog = new LogData
-            {
-                LodId = ++currentlogId,
-                LogMessage = text,
-                LogTime = DateTime.Now,
-                LogType = LogType.Error
-            };
-
-            Action action = () => { logs.Add(infoLog); };
-            dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(action));
             file = new StreamWriter(Path.Combine(logFilename, fullfilename), true);
             file.WriteLine(GenerateLogString(infoLog));
             file.Close();

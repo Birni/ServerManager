@@ -1,14 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Reflection;
+
 
 namespace ArkServer
 {
@@ -34,7 +27,7 @@ namespace ArkServer
                     {
                         mServerCollection = new ServerCollection();
 
-                        DirectoryInfo d = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "\\" + SaveFolderName);
+                        DirectoryInfo d = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory , SaveFolderName));
 
                         foreach (var file in d.GetFiles("*"+SaveDataFormat))
                         {

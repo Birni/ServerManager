@@ -7,7 +7,6 @@
       xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
       d:DesignHeight="300"
       d:DesignWidth="300"
-      Style="{DynamicResource PageStyle}"
       mc:Ignorable="d">
 
     <Grid>

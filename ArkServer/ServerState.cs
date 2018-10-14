@@ -4,12 +4,13 @@ using System.Text;
 
 namespace ArkServer
 {
-    enum ServerState
+    public enum ServerState
     {
-        Running = 0, 
-        Started = 1,
-        Stopped = 2,
-        UnexpectedStop = 3  
+        Running = 0,
+        Updating = 1,
+        Started = 2,
+        Stopped = 3,
+        Crashed = 4  
     }
 
 }
