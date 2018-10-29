@@ -48,6 +48,7 @@ namespace ServerManagerGUI.Views
             TextBox_ServerQuerryPort.Text = mServer.QueryPort.ToString();
             TextBox_ServerRconPort.Text = mServer.RconPort.ToString();
             TextBox_ServerStartArgument.Text = mServer.ServerStartArgument.ToString();
+            TextBox_ServerRconPassword.Text = mServer.RconPassword;
 
 
         }
@@ -104,12 +105,12 @@ namespace ServerManagerGUI.Views
 
         private void StartServer_Click(object sender, RoutedEventArgs e)
         {
-            mServer.StartAndUpdateServer();
+            mServer.StartServerHandler();
         }
 
         private void SaveServer_Click(object sender, RoutedEventArgs e)
         {
-            /* TODO: add implementation */
+            mServer.RconDebugAsync();
         }
 
         private async void DeleteServer_Click(object sender, RoutedEventArgs e)
@@ -150,6 +151,7 @@ namespace ServerManagerGUI.Views
                 mServer.QueryPort = Int32.Parse(TextBox_ServerQuerryPort.Text);
                 mServer.RconPort = Int32.Parse(TextBox_ServerRconPort.Text);
                 mServer.ServerStartArgument = TextBox_ServerStartArgument.Text;
+                mServer.RconPassword = TextBox_ServerRconPassword.Text;
 
                 if (mServer.ServerName != TextBox_ServerName.Text)
                 {

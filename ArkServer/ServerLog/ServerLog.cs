@@ -2,7 +2,6 @@
 using System.Windows;
 using System.Threading;
 using System.Threading.Tasks;
-
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
@@ -16,6 +15,8 @@ namespace ArkServer.Logging
 {
     public class ServerLog 
     {
+        [NonSerialized()] private readonly object _lock = new object();
+
         private static readonly string FolderName = "Logs";
         private static readonly string DataFormat = ".log";
 
@@ -55,19 +56,22 @@ namespace ArkServer.Logging
 
         public void AddLog(LogType type, string text)
         {
-            LogData infoLog = new LogData
+            lock (_lock)
             {
-                LogMessage = text,
-                LogTime = DateTime.Now,
-                LogType = type
-            };
+                LogData infoLog = new LogData
+                {
+                    LogMessage = text,
+                    LogTime = DateTime.Now,
+                    LogType = type
+                };
 
-            Action action = () => { logs.Add(infoLog); };
-            dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(action));
+                Action action = () => { logs.Add(infoLog); };
+                dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(action));
 
-            file = new StreamWriter(Path.Combine(logFilename, fullfilename), true);
-            file.WriteLine(GenerateLogString(infoLog));
-            file.Close();
+                file = new StreamWriter(Path.Combine(logFilename, fullfilename), true);
+                file.WriteLine(GenerateLogString(infoLog));
+                file.Close();
+            }
         }
     }
 }

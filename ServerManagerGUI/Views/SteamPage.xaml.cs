@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Controls;
+using SteamWeb;
 using Steam;
 
 
@@ -17,9 +18,11 @@ namespace ServerManagerGUI.Views
         {
             InitializeComponent();
 
-            TextBox_SteamPath.Text = SteamCMDInterface.MSteamCMDInterface.SteamCmdPath;
-            TextBox_SteamLogin.Text = SteamCMDInterface.MSteamCMDInterface.LoginName;
-            TextBox_SteamAppID.Text = SteamCMDInterface.MSteamCMDInterface.SteamAppId.ToString();
+            TextBox_SteamPath.Text = SteamCMDDataInterface.MSteamCMDDataInterface.SteamCmdPath;
+            TextBox_SteamLogin.Text = SteamCMDDataInterface.MSteamCMDDataInterface.LoginName;
+            TextBox_SteamAppID.Text = SteamCMDDataInterface.MSteamCMDDataInterface.SteamAppId.ToString();
+
+            TextBox_SteamApiKey.Text = SteamWebDataInterface.MSteamWebDataInterface.ApiKey;
 
             isInitialized = true;
         }
@@ -29,8 +32,8 @@ namespace ServerManagerGUI.Views
         {
             if (true == isInitialized)
             {
-                SteamCMDInterface.MSteamCMDInterface.SteamCmdPath = TextBox_SteamPath.Text;
-                SteamCMDInterface.MSteamCMDInterface.SaveToFile();
+                SteamCMDDataInterface.MSteamCMDDataInterface.SteamCmdPath = TextBox_SteamPath.Text;
+                SteamCMDDataInterface.MSteamCMDDataInterface.SaveToFile();
             }
         }
 
@@ -38,8 +41,8 @@ namespace ServerManagerGUI.Views
         {
             if (true == isInitialized)
             {
-                SteamCMDInterface.MSteamCMDInterface.LoginName = TextBox_SteamLogin.Text;
-                SteamCMDInterface.MSteamCMDInterface.SaveToFile();
+                SteamCMDDataInterface.MSteamCMDDataInterface.LoginName = TextBox_SteamLogin.Text;
+                SteamCMDDataInterface.MSteamCMDDataInterface.SaveToFile();
             }
         }
 
@@ -47,8 +50,17 @@ namespace ServerManagerGUI.Views
         {
             if (true == isInitialized)
             {
-                SteamCMDInterface.MSteamCMDInterface.SteamAppId = Int32.Parse(TextBox_SteamAppID.Text);
-                SteamCMDInterface.MSteamCMDInterface.SaveToFile();
+                SteamCMDDataInterface.MSteamCMDDataInterface.SteamAppId = Int32.Parse(TextBox_SteamAppID.Text);
+                SteamCMDDataInterface.MSteamCMDDataInterface.SaveToFile();
+            }
+        }
+
+        private void TextBox_SteamApiKeyChangedEventHandler(object sender, TextChangedEventArgs args)
+        {
+            if (true == isInitialized)
+            {
+                SteamWebDataInterface.MSteamWebDataInterface.ApiKey = TextBox_SteamApiKey.Text;
+                SteamWebDataInterface.MSteamWebDataInterface.SaveToFile();
             }
         }
 

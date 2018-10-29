@@ -7,10 +7,13 @@ namespace ArkServer
     public enum ServerState
     {
         Running = 0,
-        Updating = 1,
-        Started = 2,
-        Stopped = 3,
-        Crashed = 4  
+        Initialize = 1,
+        Updating = 2,
+        Booting = 3,
+        Started = 4,
+        RestartInProgress = 5,
+        Stopped = 6,
+        Crashed = 7  
     }
 
 }

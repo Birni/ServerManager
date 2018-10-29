@@ -11,8 +11,15 @@ namespace SteamWeb
     public class SteamWebInterface 
     {
         private const string steamWebApiBaseUrl = "https://api.steampowered.com/";
+        private string steamWebApiKey = SteamWebDataInterface.MSteamWebDataInterface.ApiKey;
         private readonly SteamWebRequest steamWebRequest;
 
+        public SteamWebInterface()
+        {
+            this.steamWebRequest = steamWebRequest == null
+                ? new SteamWebRequest(steamWebApiBaseUrl, steamWebApiKey)
+                : steamWebRequest;
+        }
 
         public SteamWebInterface(string steamWebApiBaseUrl, string steamWebApiKey)
         {
@@ -61,10 +68,20 @@ namespace SteamWeb
 
             return steamWebResponse.Data;
 
-
         }
 
-         
+        public async Task<SchemaForGameResultContainer> SchemaForGameResultContainer(string AppId)
+        {
+            var parameters = new List<SteamWebRequestParameter>
+            {
+                new SteamWebRequestParameter("appid", AppId)
+            };
 
+
+            var steamWebResponse = await GetAsync<SchemaForGameResultContainer>("ISteamUserStats", "GetSchemaForGame", 1, parameters);
+
+            return steamWebResponse.Data;
+
+        }
     }
 }

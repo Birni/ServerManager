@@ -1,22 +1,34 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Steam;
+using SteamWeb;
 using System.Threading;
 using System.Diagnostics;
 using System.IO;
 using ArkServer.Logging;
 using System.Runtime.Serialization.Formatters.Binary;
-
+using ArkServer.ServerMods;
 using System.ComponentModel;
-
+using System.Timers;
+using System.IO.Pipes;
+using System.Linq;
+using System.Text;
+using SteamWeb.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Steam;
+using Rcon;
+using ArkServer.ServerUtilities;
 
 namespace ArkServer
 {
-   [Serializable()]
-   public class Server : INotifyPropertyChanged
+    [Serializable()]
+    public class Server : INotifyPropertyChanged
     {
         [NonSerialized()] private static readonly string SaveFolderName = "Server";
         [NonSerialized()] private static readonly string SaveDataFormat = ".dat";
+        [NonSerialized()] public Process ArkProcess = null;
+        [NonSerialized()] private readonly object _lock = new object();
+
 
         string _ServerName;
         ServerState _serverState;
@@ -24,7 +36,7 @@ namespace ArkServer
 
         public string ServerName
         {
-            get { return _ServerName;  }
+            get { return _ServerName; }
             set
             {
                 _ServerName = value;
@@ -37,8 +49,11 @@ namespace ArkServer
             get { return _serverState; }
             set
             {
-                _serverState = value;
-                OnPropertyChanged("serverState");
+                lock (_lock)
+                {
+                    _serverState = value;
+                    OnPropertyChanged("serverState");
+                }
             }
         }
 
@@ -54,19 +69,23 @@ namespace ArkServer
 
 
 
-        public string ArkSurvivalFolder { get; set; }
-        public string Map { get; set; }
-        public string ServerIp { get; set; }
-        public string ServerStartArgument { get; set; }
-        public int QueryPort { get; set; }
-        public int Port { get; set; }
-        public int RconPort { get; set; }
-        public bool RconEnabled { get; set; }
-        public int maxPlayer { get; set; }
-        
+        public string ArkSurvivalFolder { get; set; } = "C:\\SERVER\\TheIsland";
+        public string Map { get; set; } = "TheIsland";
+        public string ServerIp { get; set; } = "127.0.0.1";
+        public string ServerStartArgument { get; set; } = "TheIsland?listen?SessionName=<server_name>?ServerPassword=<join_password>?ServerAdminPassword=<admin_password> -server -log ";
+        public int QueryPort { get; set; } = 27015;
+        public int Port { get; set; } = 7777;
+        public int RconPort { get; set; } = 27020;
+        public bool RconEnabled { get; set; } = true;
+        public int maxPlayer { get; set; } = 60;
+        public string RconPassword { get; set; } = "password";
 
 
-        [NonSerialized()] public ServerLog logs = null; 
+        [NonSerialized()] public ModCollection Mods = null;
+        [NonSerialized()] public ServerLog logs = null;
+        [NonSerialized()] TimeSpan TotalProcessTime = TimeSpan.Zero;
+        [NonSerialized()] int numOfTimeOuts = 0;
+        [NonSerialized()] int DateofUpdate = 0;
 
         public Server(FileInfo file)
         {
@@ -84,34 +103,22 @@ namespace ArkServer
                 RconPort = SavedData.RconPort;
                 RconEnabled = SavedData.RconEnabled;
                 maxPlayer = SavedData.maxPlayer;
+                RconPassword = SavedData.RconPassword;
                 CheckInstalledVersion();
                 serverState = ServerState.Stopped;
                 logs = new ServerLog(ServerName);
+                Mods = new ModCollection(logs);
 
                 if (!ServerCollection.MServerCollection.AddServer(this))
                 {
                     this.Delete();
                 }
-
-                logs = new ServerLog(ServerName);
-
             }
-
-
         }
+
         public Server(string key)
         {
             ServerName = key;
-            ArkSurvivalFolder = "C:\\SERVER\\TheIsland";
-            Map = "TheIsland";
-            ServerIp = "127.0.0.1";
-            ServerStartArgument = "TheIsland?listen?SessionName=<server_name>?ServerPassword=<join_password>?ServerAdminPassword=<admin_password> -server -log ";
-            QueryPort = 27015;
-            Port = 7777;
-            RconPort = 27020;
-            RconEnabled = true;
-            maxPlayer = 60;
-            
 
             if (ServerCollection.MServerCollection.AddServer(this))
             {
@@ -152,14 +159,14 @@ namespace ArkServer
                 {
                     InstalledVersion = version;
                 }
-                file.Close(); 
-                
+                file.Close();
+
             }
         }
 
         public void DeliteSaveFile()
         {
-            if (File.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory , SaveFolderName , ServerName + SaveDataFormat)))
+            if (File.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, SaveFolderName, ServerName + SaveDataFormat)))
             {
                 File.Delete(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, SaveFolderName, ServerName + SaveDataFormat));
             }
@@ -168,14 +175,13 @@ namespace ArkServer
 
         public void SaveToFile()
         {
-            if (!Directory.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory , SaveFolderName)))
+            if (!Directory.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, SaveFolderName)))
             {
-                Directory.CreateDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory , SaveFolderName));
+                Directory.CreateDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, SaveFolderName));
             }
 
-            string filename = ServerName + SaveDataFormat;
             BinaryFormatter formatter = new BinaryFormatter();
-            FileStream writerFileStream = new FileStream(Path.Combine(AppDomain.CurrentDomain.BaseDirectory , SaveFolderName , (ServerName + SaveDataFormat)) , FileMode.Create, FileAccess.Write);
+            FileStream writerFileStream = new FileStream(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, SaveFolderName, (ServerName + SaveDataFormat)), FileMode.Create, FileAccess.Write);
             formatter.Serialize(writerFileStream, this);
             writerFileStream.Close();
         }
@@ -197,68 +203,190 @@ namespace ArkServer
             return server;
         }
 
-
-        public void InitServer()
+        public async Task<AppInfo> DetermieAppInfo()
         {
-            logs = new ServerLog(ServerName);
+            SteamCMDCall steamCMDCall = new SteamCMDCall();
+            return await steamCMDCall.AppInfo();
         }
 
-        public async Task<bool> StartServer()
+        public async Task InitServer()
         {
-            if (Directory.Exists(ArkSurvivalFolder))
+            logs.AddLog(LogType.Information, "Initialize server");
+            serverState = ServerState.Initialize;
+            await Mods.DetermineMods(ArkSurvivalFolder);
+            AppInfo appinfo = new AppInfo();
+            appinfo = await DetermieAppInfo();
+
+            /*3218646 is public brunch for ark server  */
+            if ((appinfo.buildid == 3218646) && (0 != appinfo.timeupdated))
             {
-                return await Task.Run(() =>
-                {
-                    Process pProcess = new Process();
-                    pProcess.StartInfo.FileName = Path.Combine(ArkSurvivalFolder + "\\ShooterGame\\Binaries\\Win64\\ShooterGameServer.exe");
-                    pProcess.StartInfo.Arguments = ServerStartArgument +" ";
-
-                    if (!(logs == null))
-                    {
-                        logs.AddLog( LogType.Information,  "Starting server"); 
-                    }
-                    serverState = ServerState.Running;
-
-                    pProcess.Start();
-                    pProcess.WaitForExit();
-                    pProcess.Close();
-
-                    serverState = ServerState.Crashed;
-                    logs.AddLog(LogType.Critical, "Server crashed");
-
-                    return true;
-                });
+                DateofUpdate = appinfo.timeupdated;
             }
-            return false;
+            else
+            {
+                logs.AddLog(LogType.Critical, "Can not determine current server update time. Updater does not work until next update time check (5min)");
+            }
+
+
         }
 
-        public  void StartAndUpdateServer()
+        public void WatchServer(object sender, EventArgs e)
+        {
+            var newtotalTime = ArkProcess.TotalProcessorTime;
+
+            if (TotalProcessTime == newtotalTime)
+            {
+                logs.AddLog(LogType.Developer, "Server timeout");
+                numOfTimeOuts++;
+            }
+
+
+            if (numOfTimeOuts > 5)
+            {
+                logs.AddLog(LogType.Critical, "Process killed ");
+                ArkProcess.Kill();
+            }
+
+            TotalProcessTime = newtotalTime;
+
+        }
+
+        public async void CheckforUpdatesAsync(object sender, EventArgs e)
+        {
+            AppInfo appinfo = new AppInfo();
+            appinfo = await DetermieAppInfo();
+            bool needsServerUpdate = false;
+            bool needsModUpdate = false;
+
+            /*3218646 is public brunch for ark server  */
+            if ((appinfo.buildid == 3218646) && (0 != appinfo.timeupdated))
+            {
+                if ((DateofUpdate != 0) && (DateofUpdate < appinfo.timeupdated))
+                {
+                    needsServerUpdate = true;
+                    logs.AddLog(LogType.Information, "Ark server update is available");
+                }
+                else
+                {
+                    logs.AddLog(LogType.Information, "Ark server is up to date");
+                }
+
+                if ((DateofUpdate != 0))
+                {
+                    DateofUpdate = appinfo.timeupdated;
+                }
+            }
+
+            if ((DateofUpdate == 0) && (DateofUpdate == 0))
+            {
+                logs.AddLog(LogType.Critical, "Can not determine current server update time. Updater does not work until next update time check (5min)");
+            }
+
+            if (await Mods.CheckModsForUpdates())
+            {
+                needsModUpdate = true;
+            }
+
+
+            if (true == needsServerUpdate)
+            {
+                Utilities util = new Utilities(this);
+                await util.ServerRestart(30, "ark update");
+
+                needsModUpdate = false;
+            }
+
+            if (true == needsModUpdate)
+            {
+                Utilities util = new Utilities(this);
+                await util.ServerRestart(30, "mod update");
+
+            }
+
+
+        }
+
+        public async void RconDebugAsync()
+        {
+            Utilities util = new Utilities(this);
+            await util.ServerRestart(0, "test" );
+        }
+
+
+
+
+        public void StartServer()
+        {
+            ArkProcess = new Process();
+            ArkProcess.StartInfo.FileName = Path.Combine(ArkSurvivalFolder  ,"ShooterGame" , "Binaries" , "Win64" , "ShooterGameServer.exe");
+            ArkProcess.StartInfo.Arguments = ServerStartArgument + " ";
+            //ArkProcess.StartInfo.UseShellExecute = true;
+            //ArkProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+
+
+            logs.AddLog(LogType.Information, "Starting server");
+            serverState = ServerState.Running;
+
+
+            System.Timers.Timer timer = new System.Timers.Timer(TimeSpan.FromSeconds(20).TotalMilliseconds);
+            timer.AutoReset = true;
+            timer.Elapsed += new ElapsedEventHandler(WatchServer);
+
+            ArkProcess.Start();
+            TotalProcessTime = TimeSpan.Zero;
+            numOfTimeOuts = 0;
+            timer.Start();
+            ArkProcess.WaitForExit();
+            timer.Stop();
+            ArkProcess.Close();
+
+
+            if (serverState != ServerState.Stopped)
+            {
+                serverState = ServerState.Crashed;
+                logs.AddLog(LogType.Critical, "Server crashed");
+            }
+        }
+
+
+        public void UpdateServer()
+        {
+
+            SteamCMDCall steamCMDCall = new SteamCMDCall();
+            logs.AddLog(LogType.Information, "Updating server");
+            
+            serverState = ServerState.Updating;
+
+            var output = steamCMDCall.UpdateServer(this.ArkSurvivalFolder);
+            output.Wait();
+
+
+            logs.AddLog(LogType.Information, "Server update finished");
+            CheckInstalledVersion();
+        }
+        public void StartServerHandler()
         {
             new Thread(async () =>
-            {
-                Thread.CurrentThread.IsBackground = true;
-                SteamCMDCall steamCMDCall = new SteamCMDCall();
+           {
+               Thread.CurrentThread.IsBackground = true;
+               do
+               {
+                   System.Timers.Timer timer = new System.Timers.Timer(TimeSpan.FromMinutes(5).TotalMilliseconds);
+                   timer.AutoReset = true;
+                   timer.Elapsed += new ElapsedEventHandler(CheckforUpdatesAsync);
 
-                if (!(logs == null))
-                {
-                    logs.AddLog(LogType.Information, "Updating server");
-                }
-                serverState = ServerState.Updating;
+                   await InitServer();
+                   UpdateServer();
+                   timer.Start();
+                   StartServer();
+                   timer.Stop();
 
-                var output = steamCMDCall.UpdateServer(this.ArkSurvivalFolder);
-                output.Wait();
 
-                if (!(logs == null))
-                {
-                    logs.AddLog(LogType.Information, "Server update finished");
-                }
+               }
+               while (serverState != ServerState.Stopped);
 
-                CheckInstalledVersion();
-                await StartServer();
-                
 
-            }).Start();
+           }).Start();
         }
-
     }
 }

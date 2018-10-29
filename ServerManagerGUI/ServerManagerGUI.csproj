@@ -189,8 +189,12 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ArkServer\ArkServer.csproj">
-      <Project>{c00dad98-4fad-43a8-b56b-7464102128e4}</Project>
+      <Project>{2a7cf553-920d-47de-a55b-0e6e6eef0350}</Project>
       <Name>ArkServer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DiscordBot\DiscordBot.csproj">
+      <Project>{92c72000-4f29-43e0-9c79-5428c066a7d4}</Project>
+      <Name>DiscordBot</Name>
     </ProjectReference>
     <ProjectReference Include="..\Rcon\Rcon.csproj">
       <Project>{2d630c21-754d-4d2d-93e2-0c7f5d4549ac}</Project>
@@ -201,7 +205,7 @@
       <Name>SteamWeb</Name>
     </ProjectReference>
     <ProjectReference Include="..\Steam\Steam.csproj">
-      <Project>{3f893dfe-b44b-484b-b425-b98c8703d3d2}</Project>
+      <Project>{87f1278d-0618-47d0-ba66-7ac59deab351}</Project>
       <Name>Steam</Name>
     </ProjectReference>
   </ItemGroup>

@@ -32,6 +32,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />                
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
 
@@ -69,6 +70,20 @@
 
             <StackPanel Grid.Row="2" Grid.Column="1" VerticalAlignment="Center">
                 <TextBox x:Name="TextBox_SteamAppID" Text="346110" TextChanged="TextBox_SteamAppIDChangedEventHandler" VerticalAlignment="Center" Margin="2,2,2,2">
+                    <TextBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="This is only a Test-Item" />
+                        </ContextMenu>
+                    </TextBox.ContextMenu>
+                </TextBox>
+            </StackPanel>
+
+            <StackPanel Grid.Row="3" Grid.Column="0" VerticalAlignment="Center">
+                <Label Content="Steam Api Key:" Style="{DynamicResource DescriptionHeaderStyle}" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="3" Grid.Column="1" VerticalAlignment="Center">
+                <TextBox x:Name="TextBox_SteamApiKey" Text="apikey" TextChanged="TextBox_SteamApiKeyChangedEventHandler" VerticalAlignment="Center" Margin="2,2,2,2">
                     <TextBox.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="This is only a Test-Item" />

@@ -38,7 +38,7 @@
                                 </StackPanel>
 
                                 <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">
-                                        <Label x:Name="Label_Status" Content="Running" DataContextChanged="StatusDataChanged" Style="{DynamicResource DescriptionHeaderStyle}" />
+                                        <Label x:Name="Label_Status" Content="Stopped" DataContextChanged="StatusDataChanged" Style="{DynamicResource DescriptionHeaderStyle}" />
                                 </StackPanel>
                             </Grid>
 
@@ -147,6 +147,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <StackPanel Grid.Column="0" VerticalAlignment="Center">
@@ -220,11 +221,11 @@
                     </StackPanel>
 
                     <StackPanel Grid.Row="5" Grid.Column="0" VerticalAlignment="Center">
-                        <Label Content="Server Port:" Style="{DynamicResource DescriptionHeaderStyle}" />
+                        <Label Content="Rcon Password:" Style="{DynamicResource DescriptionHeaderStyle}" />
                     </StackPanel>
 
                     <StackPanel Grid.Row="5" Grid.Column="1" VerticalAlignment="Center">
-                        <TextBox x:Name="TextBox_ServerPort" Text="9999" VerticalAlignment="Center" Margin="2,2,2,2">
+                        <TextBox x:Name="TextBox_ServerRconPassword" Text="Password" VerticalAlignment="Center" Margin="2,2,2,2">
                             <TextBox.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Header="This is only a Test-Item" />
@@ -234,10 +235,24 @@
                     </StackPanel>
 
                     <StackPanel Grid.Row="6" Grid.Column="0" VerticalAlignment="Center">
-                        <Label Content="Start argment:" Style="{DynamicResource DescriptionHeaderStyle}" />
+                        <Label Content="Server Port:" Style="{DynamicResource DescriptionHeaderStyle}" />
                     </StackPanel>
 
                     <StackPanel Grid.Row="6" Grid.Column="1" VerticalAlignment="Center">
+                        <TextBox x:Name="TextBox_ServerPort" Text="9999" VerticalAlignment="Center" Margin="2,2,2,2">
+                            <TextBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="This is only a Test-Item" />
+                                </ContextMenu>
+                            </TextBox.ContextMenu>
+                        </TextBox>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="7" Grid.Column="0" VerticalAlignment="Center">
+                        <Label Content="Start argment:" Style="{DynamicResource DescriptionHeaderStyle}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="7" Grid.Column="1" VerticalAlignment="Center">
                         <TextBox x:Name="TextBox_ServerStartArgument" Text="Ragnarok?QueryPort=27015?MultiHome=185.38.149.15?RCONEnabled=true?RCONPort=32330?MaxPlayers=120?TribeLogDestroyedEnemyStructures=true?Port=7777?UseOptimizedHarvestingHealth=true?ForceAllStructureLocking=true?ServerCrosshair=True?listen -ClusterDirOverride=C:\SERVER\Ark_ServerX10\clusters -NoTransferFromFiltering -clusterid=2017ARK -automanagedmods -UseBattlEye -nosteamclient -AutoDestroyStructures -game -server -ForceRespawnDinos -log -servergamelog -servergamelogincludetribelogs " VerticalAlignment="Center" Margin="2,2,2,2">
                             <TextBox.ContextMenu>
                                 <ContextMenu>
@@ -247,7 +262,7 @@
                         </TextBox>
                     </StackPanel>
 
-                    <StackPanel Grid.Row="7" Grid.Column="1" VerticalAlignment="Center">
+                    <StackPanel Grid.Row="8" Grid.Column="1" VerticalAlignment="Center">
                         <Grid Margin="10,10,10,10">
                             <Button Click="ServerSettingsSave_Click" Content="Save" HorizontalAlignment="Right" Width="75"  Margin="0,0,0,0"/>
                         </Grid>
