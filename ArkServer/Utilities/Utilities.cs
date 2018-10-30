@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Rcon;
 using ArkServer.Logging;
+using DiscordWebhook;
 
 namespace ArkServer.ServerUtilities
 {
@@ -77,45 +78,80 @@ namespace ArkServer.ServerUtilities
         {
             if (mServer != null)
             {
+                Webhook webhook = new Webhook(WebhookDataInterface.MWebhookDataInterface.WebhoockLink);
+                bool firstannouncementgiven = false;
+
+
                 if (TimeInMin >= 60)
                 {
+                    await webhook.Send(mServer.ServerName+ " server restart. Reason:" + reason + ". server will shutdown in 60 minutes");
+                    firstannouncementgiven = true;
                     await BroadcastMessageAsync("server restart. Reason:" + reason + ". server will shutdown in 60 minutes");
                     mServer.logs.AddLog(LogType.Information, "server restart. Reason:" + reason + ". server will shutdown in 60 minutes");
                     await Task.Delay((int)TimeSpan.FromMinutes(15).TotalMilliseconds).ConfigureAwait(false);
                 }
                 if (TimeInMin >= 45)
                 {
+                    if (!firstannouncementgiven)
+                    {
+                        await webhook.Send(mServer.ServerName + " server restart. Reason:" + reason + ". server will shutdown in 60 minutes");
+                        firstannouncementgiven = true;
+                    }
+
                     await BroadcastMessageAsync("server restart. Reason:" + reason +". server will shutdown in 45 minutes");
                     mServer.logs.AddLog(LogType.Information, "server restart. Reason:" + reason + ". server will shutdown in 45 minutes");
                     await Task.Delay((int)TimeSpan.FromMinutes(15).TotalMilliseconds).ConfigureAwait(false);
                 }
                 if (TimeInMin >= 30)
                 {
+                    if (!firstannouncementgiven)
+                    {
+                        await webhook.Send(mServer.ServerName + " server restart. Reason:" + reason + ". server will shutdown in 60 minutes");
+                        firstannouncementgiven = true;
+                    }
 
-                    await BroadcastMessageAsync("server restart. Reason:" + reason + ". server will shutdown in 30 minutes");
+                    await BroadcastMessageAsync(mServer.ServerName + " server restart. Reason:" + reason + ". server will shutdown in 30 minutes");
                     mServer.logs.AddLog(LogType.Information, "server restart. Reason:" + reason + ". server will shutdown in 45 minutes");
                     await Task.Delay((int)TimeSpan.FromMinutes(15).TotalMilliseconds).ConfigureAwait(false);
                 }
                 if (TimeInMin >= 15)
                 {
+                    if (!firstannouncementgiven)
+                    {
+                        await webhook.Send(mServer.ServerName + " server restart. Reason:" + reason + ". server will shutdown in 60 minutes");
+                        firstannouncementgiven = true;
+                    }
+
                     await BroadcastMessageAsync("server restart. Reason:" + reason + ". server will shutdown in 15 minutes");
                     mServer.logs.AddLog(LogType.Information, "server restart. Reason:" + reason + ". server will shutdown in 15 minutes");
                     await Task.Delay((int)TimeSpan.FromMinutes(5).TotalMilliseconds).ConfigureAwait(false);
                 }
                 if (TimeInMin >= 10)
                 {
-                    await BroadcastMessageAsync("server restart. Reason:" + reason + ". server will shutdown in 10 minutes");
+                    if (!firstannouncementgiven)
+                    {
+                        await webhook.Send(mServer.ServerName + " server restart. Reason:" + reason + ". server will shutdown in 60 minutes");
+                        firstannouncementgiven = true;
+                    }
+
+                    await BroadcastMessageAsync(mServer.ServerName + " server restart. Reason:" + reason + ". server will shutdown in 10 minutes");
                     mServer.logs.AddLog(LogType.Information, "server restart. Reason:" + reason + ". server will shutdown in 10 minutes");
                     await Task.Delay((int)TimeSpan.FromMinutes(5).TotalMilliseconds).ConfigureAwait(false);
                 }
                 if (TimeInMin >= 5)
                 {
-                    await BroadcastMessageAsync("server restart. Reason:" + reason + ". server will shutdown in 5 minutes");
+                    if (!firstannouncementgiven)
+                    {
+                        await webhook.Send(mServer.ServerName + " server restart. Reason:" + reason + ". server will shutdown in 60 minutes");
+                        firstannouncementgiven = true;
+                    }
+
+                    await BroadcastMessageAsync(mServer.ServerName + " server restart. Reason:" + reason + ". server will shutdown in 5 minutes");
                     mServer.logs.AddLog(LogType.Information, "server restart. Reason:" + reason + ". server will shutdown in 5 minutes");
                     await Task.Delay((int)TimeSpan.FromMinutes(4).TotalMilliseconds).ConfigureAwait(false);
                 }
 
-                await BroadcastMessageAsync("server restart for. Reason:" + reason + ". server will shutdown in 1 minute");
+                await BroadcastMessageAsync(mServer.ServerName + " server restart for. Reason:" + reason + ". server will shutdown in 1 minute");
                 mServer.logs.AddLog(LogType.Information, "server restart. Reason:" + reason + ". server will shutdown in 1 minutes");
                 await Task.Delay((int)TimeSpan.FromMinutes(1).TotalMilliseconds).ConfigureAwait(false);
 

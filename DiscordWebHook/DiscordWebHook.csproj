@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{2A7CF553-920D-47DE-A55B-0E6E6EEF0350}</ProjectGuid>
+    <ProjectGuid>{6127A53A-FAA0-44D6-AA60-8A731E97A5C3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ArkServer</RootNamespace>
-    <AssemblyName>ArkServer</AssemblyName>
+    <RootNamespace>DiscordWebHook</RootNamespace>
+    <AssemblyName>DiscordWebHook</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -35,50 +35,23 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Utilities\Utilities.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="Embed.cs" />
+    <Compile Include="Webhook.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Server.cs" />
-    <Compile Include="ServerCollection.cs" />
-    <Compile Include="ServerLog\ILogData.cs" />
-    <Compile Include="ServerLog\LogType.cs" />
-    <Compile Include="ServerLog\ServerLog.cs" />
-    <Compile Include="ServerMods\Mod.cs" />
-    <Compile Include="ServerMods\ModCollection.cs" />
-    <Compile Include="ServerState.cs" />
+    <Compile Include="WebhookDataInterface.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\DiscordBot\DiscordBot.csproj">
-      <Project>{92c72000-4f29-43e0-9c79-5428c066a7d4}</Project>
-      <Name>DiscordBot</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DiscordWebHook\DiscordWebHook.csproj">
-      <Project>{6127a53a-faa0-44d6-aa60-8a731e97a5c3}</Project>
-      <Name>DiscordWebHook</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Rcon\Rcon.csproj">
-      <Project>{2d630c21-754d-4d2d-93e2-0c7f5d4549ac}</Project>
-      <Name>Rcon</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SteamWeb\SteamWeb.csproj">
-      <Project>{e73149b8-fdc0-48f0-b6b7-d40ea40c6499}</Project>
-      <Name>SteamWeb</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Steam\Steam.csproj">
-      <Project>{87f1278d-0618-47d0-ba66-7ac59deab351}</Project>
-      <Name>Steam</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

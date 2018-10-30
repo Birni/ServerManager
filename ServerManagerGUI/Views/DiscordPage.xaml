@@ -18,5 +18,36 @@
                                        Foreground="{DynamicResource AccentBaseColorBrush}"
                                        Kind="DiscordBrands" />
 
+
+        <Grid Margin="10,68,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+
+            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                <Label Content="Webhook url:" Style="{DynamicResource DescriptionHeaderStyle}" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">
+                <TextBox x:Name="TextBox_Webhook" Text="link" TextChanged="TextBox_WebhookChangedEventHandler" VerticalAlignment="Center" Margin="2,2,2,2">
+                    <TextBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="This is only a Test-Item" />
+                        </ContextMenu>
+                    </TextBox.ContextMenu>
+                </TextBox>
+            </StackPanel>
+
+        </Grid>
+
+
+
+
     </Grid>
+
 </UserControl>

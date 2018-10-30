@@ -18,6 +18,7 @@ using Newtonsoft.Json.Linq;
 using Steam;
 using Rcon;
 using ArkServer.ServerUtilities;
+using DiscordWebhook;
 
 namespace ArkServer
 {
@@ -366,6 +367,7 @@ namespace ArkServer
         }
         public void StartServerHandler()
         {
+            Webhook webhook = new Webhook("https://discordapp.com/api/webhooks/506598531579248660/QF5eqSWaTVD98q1rbIPqKZ0yyF1cAtIVmC5UzOxcwUN8VoAtEJaqunwdyHi8OMToyiGn");
             new Thread(async () =>
            {
                Thread.CurrentThread.IsBackground = true;
@@ -378,6 +380,7 @@ namespace ArkServer
                    await InitServer();
                    UpdateServer();
                    timer.Start();
+                   await webhook.Send(ServerName +"server is booting");
                    StartServer();
                    timer.Stop();
 
