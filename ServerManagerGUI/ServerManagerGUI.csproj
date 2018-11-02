@@ -85,6 +85,7 @@
     <Compile Include="Navigation\Navigation.cs" />
     <Compile Include="Nvvm\BindableBase.cs" />
     <Compile Include="Nvvm\DelegateCommand.cs" />
+    <Compile Include="ViewModels\UpdateTimes.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
     <Compile Include="ViewModels\MenuItem.cs" />

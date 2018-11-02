@@ -19,6 +19,7 @@ using Steam;
 using Rcon;
 using ArkServer.ServerUtilities;
 using DiscordWebhook;
+using System.Collections.Generic;
 
 namespace ArkServer
 {
@@ -218,8 +219,7 @@ namespace ArkServer
             AppInfo appinfo = new AppInfo();
             appinfo = await DetermieAppInfo();
 
-            /*3218646 is public brunch for ark server  */
-            if ((appinfo.buildid == 3218646) && (0 != appinfo.timeupdated))
+            if (0 != appinfo.timeupdated)
             {
                 DateofUpdate = appinfo.timeupdated;
             }
@@ -254,54 +254,68 @@ namespace ArkServer
 
         public async void CheckforUpdatesAsync(object sender, EventArgs e)
         {
-            AppInfo appinfo = new AppInfo();
-            appinfo = await DetermieAppInfo();
-            bool needsServerUpdate = false;
-            bool needsModUpdate = false;
-
-            /*3218646 is public brunch for ark server  */
-            if ((appinfo.buildid == 3218646) && (0 != appinfo.timeupdated))
+            if (serverState != ServerState.RestartInProgress)
             {
-                if ((DateofUpdate != 0) && (DateofUpdate < appinfo.timeupdated))
+                AppInfo appinfo = new AppInfo();
+                appinfo = await DetermieAppInfo();
+                bool needsServerUpdate = false;
+                bool needsModUpdate = false;
+
+                /*3218646 is public brunch for ark server  */
+                if (0 != appinfo.timeupdated)
                 {
-                    needsServerUpdate = true;
-                    logs.AddLog(LogType.Information, "Ark server update is available");
+                    if ((DateofUpdate != 0) && (DateofUpdate < appinfo.timeupdated))
+                    {
+                        needsServerUpdate = true;
+                        Webhook webhook = new Webhook(WebhookDataInterface.MWebhookDataInterface.WebhoockLink);
+                        await webhook.Send("```" + ServerName + " Ark server update is available" + "```");
+                        logs.AddLog(LogType.Information, "Ark server update is available");
+                    }
+                    else
+                    {
+                        logs.AddLog(LogType.Information, "Ark server is up to date");
+                    }
+
+                    if ((DateofUpdate != 0))
+                    {
+                        DateofUpdate = appinfo.timeupdated;
+                    }
                 }
-                else
+
+                if ((DateofUpdate == 0) && (DateofUpdate == 0))
                 {
-                    logs.AddLog(LogType.Information, "Ark server is up to date");
+                    logs.AddLog(LogType.Critical, "Can not determine current server update time. Updater does not work until next update time check (5min)");
                 }
 
-                if ((DateofUpdate != 0))
+                List<string> list = new List<string>();
+                List<string> updatelist = await Mods.CheckModsForUpdates();
+
+                if (updatelist.Count > 0)
                 {
-                    DateofUpdate = appinfo.timeupdated;
+                    Webhook webhook = new Webhook(WebhookDataInterface.MWebhookDataInterface.WebhoockLink);
+                    foreach (var mod in updatelist)
+                    {
+                        await webhook.Send("```" + ServerName + " Mod: " + mod + " needs a update" + "```");
+                    }
+
+                    needsModUpdate = true;
                 }
-            }
-
-            if ((DateofUpdate == 0) && (DateofUpdate == 0))
-            {
-                logs.AddLog(LogType.Critical, "Can not determine current server update time. Updater does not work until next update time check (5min)");
-            }
-
-            if (await Mods.CheckModsForUpdates())
-            {
-                needsModUpdate = true;
-            }
 
 
-            if (true == needsServerUpdate)
-            {
-                Utilities util = new Utilities(this);
-                await util.ServerRestart(30, "ark update");
+                if (true == needsServerUpdate)
+                {
+                    Utilities util = new Utilities(this);
+                    await util.ServerStop(30, "Ark update" , true);
 
-                needsModUpdate = false;
-            }
+                    needsModUpdate = false;
+                }
 
-            if (true == needsModUpdate)
-            {
-                Utilities util = new Utilities(this);
-                await util.ServerRestart(30, "mod update");
+                if (true == needsModUpdate)
+                {
+                    Utilities util = new Utilities(this);
+                    await util.ServerStop(30, " mod update", true);
 
+                }
             }
 
 
@@ -310,13 +324,13 @@ namespace ArkServer
         public async void RconDebugAsync()
         {
             Utilities util = new Utilities(this);
-            await util.ServerRestart(0, "test" );
+            await util.ServerStop(0, "test" , true);
         }
 
 
 
 
-        public void StartServer()
+        public async void StartServerAsync()
         {
             ArkProcess = new Process();
             ArkProcess.StartInfo.FileName = Path.Combine(ArkSurvivalFolder  ,"ShooterGame" , "Binaries" , "Win64" , "ShooterGameServer.exe");
@@ -344,8 +358,10 @@ namespace ArkServer
 
             if (serverState != ServerState.Stopped)
             {
+                Webhook webhook = new Webhook(WebhookDataInterface.MWebhookDataInterface.WebhoockLink);
                 serverState = ServerState.Crashed;
                 logs.AddLog(LogType.Critical, "Server crashed");
+                await webhook.Send("```" + ServerName + ": Opps the server crashed!! A team of highly trained jerboas has been dispatched to deal with this situation. Please stay calm!" + "```");
             }
         }
 
@@ -367,7 +383,7 @@ namespace ArkServer
         }
         public void StartServerHandler()
         {
-            Webhook webhook = new Webhook("https://discordapp.com/api/webhooks/506598531579248660/QF5eqSWaTVD98q1rbIPqKZ0yyF1cAtIVmC5UzOxcwUN8VoAtEJaqunwdyHi8OMToyiGn");
+            Webhook webhook = new Webhook(WebhookDataInterface.MWebhookDataInterface.WebhoockLink);
             new Thread(async () =>
            {
                Thread.CurrentThread.IsBackground = true;
@@ -380,8 +396,8 @@ namespace ArkServer
                    await InitServer();
                    UpdateServer();
                    timer.Start();
-                   await webhook.Send(ServerName +"server is booting");
-                   StartServer();
+                   await webhook.Send("```"+ServerName + ": Server is booting. The server should running in few moments." + "```");
+                   StartServerAsync();
                    timer.Stop();
 
 

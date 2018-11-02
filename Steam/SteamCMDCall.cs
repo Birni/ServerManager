@@ -91,13 +91,14 @@ namespace Steam
                     var appinfo = new AppInfo();
 
 
-                    
+                    if (!string.IsNullOrEmpty(output))
+                    {
+                        output = Regex.Replace(output, @"\t|\n|\r|\{", "");
+                        var splitoutput = output.Split('\"');
 
-                    output = Regex.Replace(output, @"\t|\n|\r|\{", "");
-                    var splitoutput = output.Split('\"');
-
-                    appinfo.buildid = Int32.Parse(splitoutput[5]);
-                    appinfo.timeupdated = Int32.Parse(splitoutput[9]);
+                        appinfo.buildid = Int32.Parse(splitoutput[5]);
+                        appinfo.timeupdated = Int32.Parse(splitoutput[9]);
+                    }
 
 
                     pProcess.Close();

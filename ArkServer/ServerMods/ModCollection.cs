@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ArkServer.Logging;
+using DiscordWebhook;
 
 namespace ArkServer.ServerMods
 {
@@ -93,15 +94,19 @@ namespace ArkServer.ServerMods
             }
         }
 
-        public async Task<bool> CheckModsForUpdates()
+        public async Task<List<string>> CheckModsForUpdates()
         {
             bool needupdate = false;
+            Webhook webhook = new Webhook(WebhookDataInterface.MWebhookDataInterface.WebhoockLink);
 
-            foreach(Mod mod in mModCollection)
+            List<string> list = new List<string>();
+
+            foreach (Mod mod in mModCollection)
             {
                 if (await mod.IsUpaded())
                 {
                     mlog.AddLog(LogType.Information, ("ModId: " + mod.ModId + " ModName: " + mod.ModName + "need a update"));
+                    list.Add(mod.ModName);
                     needupdate = true;
                 }
             }
@@ -111,7 +116,7 @@ namespace ArkServer.ServerMods
                 mlog.AddLog(LogType.Information, ("All mods are up to date "));
             }
 
-            return needupdate;
+            return list;
         }
 
     }
