@@ -14,6 +14,9 @@ using DiscordWebhook;
 using ArkServer.ServerUtilities;
 using System.Collections.Generic;
 using System.Windows.Controls.Primitives;
+using System.Threading;
+using System.Threading.Tasks;
+using ArkServer.Logging;
 
 namespace ServerManagerGUI.Views
 {
@@ -25,6 +28,8 @@ namespace ServerManagerGUI.Views
     {
         Server mServer = null;
         ShellViewModel mShellViewModel = null;
+        public Task mtask1;
+        public Task mtask2;
 
         internal ServerPage(ShellViewModel ShellViewModel, Server server)
         {
@@ -54,19 +59,21 @@ namespace ServerManagerGUI.Views
             TextBox_ServerStartArgument.Text = mServer.ServerStartArgument.ToString();
             TextBox_ServerRconPassword.Text = mServer.RconPassword;
 
-            List<string> Restarttimes = new List<string>();
-
-            Restarttimes.Add("60 min");
-            Restarttimes.Add("45 min");
-            Restarttimes.Add("30 min");
-            Restarttimes.Add("15 min");
-            Restarttimes.Add("10 min");
-            Restarttimes.Add("5 min");
-            Restarttimes.Add("1 min");
-            Restarttimes.Add("now");
+            List<string> Restarttimes = new List<string>
+            {
+                "60 min",
+                "45 min",
+                "30 min",
+                "15 min",
+                "10 min",
+                "5 min",
+                "1 min",
+                "now"
+            };
 
             RestartTimerButton.ItemsSource = Restarttimes;
             ServerStopTimerButton.ItemsSource = Restarttimes;
+
         }
 
         void OnLoad(object sender, RoutedEventArgs e)
@@ -126,7 +133,14 @@ namespace ServerManagerGUI.Views
 
         private void SaveServer_Click(object sender, RoutedEventArgs e)
         {
-            mServer.CheckforUpdatesAsync(sender, e);
+            if (!mServer.RestartTask.IsCompleted)
+            {
+                mServer.cancellationTokenRestart.Cancel();
+                mServer.cancellationTokenRestart.Dispose(); ;
+            }
+
+            //        mServer.cancellationTokenRestart.Cancel();
+
         }
 
         private async void DeleteServer_Click(object sender, RoutedEventArgs e)
@@ -230,7 +244,7 @@ namespace ServerManagerGUI.Views
             {
                 if (mServer.serverState == ServerState.Running)
                 {
-                    Utilities util = new ArkServer.ServerUtilities.Utilities(mServer);
+                    Utilities util = new Utilities(mServer);
                     bool successfully = await  util.BroadcastMessageAsync(Broadcast_Textbox.Text);
 
 
@@ -267,81 +281,121 @@ namespace ServerManagerGUI.Views
         {
             string reason = "unknown";
 
-            if (!string.IsNullOrEmpty(Restart_Textbox.Text))
+            if (mServer.serverState == ServerState.Running)
             {
-                reason = Restart_Textbox.Text;
-            }
-            Utilities util = new Utilities(mServer);
+                if (!string.IsNullOrEmpty(Restart_Textbox.Text))
+                {
+                    reason = Restart_Textbox.Text;
+                }
+                Utilities util = new Utilities(mServer);
+                mServer.cancellationTokenRestart = new CancellationTokenSource();
 
-            switch (RestartTimerButton.SelectedIndex)
+                switch (RestartTimerButton.SelectedIndex)
+                {
+                    case 0:
+                        mServer.RestartTask = util.ServerStopOrRestart(45, reason, true, mServer.cancellationTokenRestart.Token);
+                        break;
+                    case 1:
+                        mServer.RestartTask = util.ServerStopOrRestart(45, reason, true, mServer.cancellationTokenRestart.Token);
+                        break;
+                    case 2:
+                        mServer.RestartTask = util.ServerStopOrRestart(30, reason, true, mServer.cancellationTokenRestart.Token);
+                        break;
+                    case 3:
+                        mServer.RestartTask = util.ServerStopOrRestart(15, reason, true, mServer.cancellationTokenRestart.Token);
+                        break;
+                    case 4:
+                        mServer.RestartTask = util.ServerStopOrRestart(10, reason, true, mServer.cancellationTokenRestart.Token);
+                        break;
+                    case 5:
+                        mServer.RestartTask = util.ServerStopOrRestart(5, reason, true, mServer.cancellationTokenRestart.Token);
+                        break;
+                    case 6:
+                        mServer.RestartTask = util.ServerStopOrRestart(1, reason, true, mServer.cancellationTokenRestart.Token);
+                        break;
+                    case 7:
+                        mServer.RestartTask = util.ServerStopOrRestart(0, reason, true, mServer.cancellationTokenRestart.Token);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else
             {
-                case 0:
-                    await util.ServerStop(60, reason, true);
-                    break;
-                case 1:
-                    await util.ServerStop(45, reason, true);
-                    break;
-                case 2:
-                    await util.ServerStop(30, reason, true);
-                    break;
-                case 3:
-                    await util.ServerStop(15, reason, true);
-                    break;
-                case 4:
-                    await util.ServerStop(10, reason, true);
-                    break;
-                case 5:
-                    await util.ServerStop(5, reason, true);
-                    break;
-                case 6:
-                    await util.ServerStop(1, reason, true);
-                    break;
-                case 7:
-                    await util.ServerStop(0, reason, true);
-                    break;
-                default:
-                    break;
+                var metroWindow = (Application.Current.MainWindow as MetroWindow);
+
+                var mySettings = new MetroDialogSettings()
+                {
+                    AnimateShow = true,
+                    AffirmativeButtonText = "OK",
+                    ColorScheme = metroWindow.MetroDialogOptions.ColorScheme
+                };
+
+                MessageDialogResult result = await metroWindow.ShowMessageAsync("Server is not running", "The server has to run to schedule a server restart",
+                    MessageDialogStyle.Affirmative, mySettings);
+
             }
         }
+
 
         private async void ServerStop_Click(object sender, RoutedEventArgs e)
         {
             string reason = "unknown";
 
-            if (!string.IsNullOrEmpty(ServerStop_Textbox.Text))
+            if (mServer.serverState == ServerState.Running)
             {
-                reason = ServerStop_Textbox.Text;
-            }
-            Utilities util = new Utilities(mServer);
 
-            switch (ServerStopTimerButton.SelectedIndex)
+                if (!string.IsNullOrEmpty(ServerStop_Textbox.Text))
+                {
+                    reason = ServerStop_Textbox.Text;
+                }
+                Utilities util = new Utilities(mServer);
+                mServer.cancellationTokenRestart = new CancellationTokenSource();
+
+                switch (ServerStopTimerButton.SelectedIndex)
+                {
+                    case 0:
+                        mServer.RestartTask = util.ServerStopOrRestart(45, reason, false, mServer.cancellationTokenRestart.Token);
+                        break;
+                    case 1:
+                        mServer.RestartTask = util.ServerStopOrRestart(45, reason, false, mServer.cancellationTokenRestart.Token);
+                        break;
+                    case 2:
+                        mServer.RestartTask = util.ServerStopOrRestart(30, reason, false, mServer.cancellationTokenRestart.Token);
+                        break;
+                    case 3:
+                        mServer.RestartTask = util.ServerStopOrRestart(15, reason, false, mServer.cancellationTokenRestart.Token);
+                        break;
+                    case 4:
+                        mServer.RestartTask = util.ServerStopOrRestart(10, reason, false, mServer.cancellationTokenRestart.Token);
+                        break;
+                    case 5:
+                        mServer.RestartTask = util.ServerStopOrRestart(5, reason, false, mServer.cancellationTokenRestart.Token);
+                        break;
+                    case 6:
+                        mServer.RestartTask = util.ServerStopOrRestart(1, reason, false, mServer.cancellationTokenRestart.Token);
+                        break;
+                    case 7:
+                        mServer.RestartTask = util.ServerStopOrRestart(0, reason, false, mServer.cancellationTokenRestart.Token);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else
             {
-                case 0:
-                    await util.ServerStop(60, reason, false);
-                    break;
-                case 1:
-                    await util.ServerStop(45, reason, false);
-                    break;
-                case 2:
-                    await util.ServerStop(30, reason, false);
-                    break;
-                case 3:
-                    await util.ServerStop(15, reason, false);
-                    break;
-                case 4:
-                    await util.ServerStop(10, reason, false);
-                    break;
-                case 5:
-                    await util.ServerStop(5, reason, false);
-                    break;
-                case 6:
-                    await util.ServerStop(1, reason, false);
-                    break;
-                case 7:
-                    await util.ServerStop(0, reason, false);
-                    break;
-                default:
-                    break;
+                var metroWindow = (Application.Current.MainWindow as MetroWindow);
+
+                var mySettings = new MetroDialogSettings()
+                {
+                    AnimateShow = true,
+                    AffirmativeButtonText = "OK",
+                    ColorScheme = metroWindow.MetroDialogOptions.ColorScheme
+                };
+
+                MessageDialogResult result = await metroWindow.ShowMessageAsync("Server is not running", "The server has to run to schedule a server stop",
+                    MessageDialogStyle.Affirmative, mySettings);
+
             }
         }
 

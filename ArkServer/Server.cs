@@ -20,6 +20,7 @@ using Rcon;
 using ArkServer.ServerUtilities;
 using DiscordWebhook;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace ArkServer
 {
@@ -79,7 +80,7 @@ namespace ArkServer
         public int Port { get; set; } = 7777;
         public int RconPort { get; set; } = 27020;
         public bool RconEnabled { get; set; } = true;
-        public int maxPlayer { get; set; } = 60;
+        public int MaxPlayer { get; set; } = 60;
         public string RconPassword { get; set; } = "password";
 
 
@@ -88,6 +89,8 @@ namespace ArkServer
         [NonSerialized()] TimeSpan TotalProcessTime = TimeSpan.Zero;
         [NonSerialized()] int numOfTimeOuts = 0;
         [NonSerialized()] int DateofUpdate = 0;
+        [field: NonSerialized()] public CancellationTokenSource cancellationTokenRestart { get; set; }
+        [field: NonSerialized()] public Task RestartTask { get; set; }
 
         public Server(FileInfo file)
         {
@@ -104,12 +107,14 @@ namespace ArkServer
                 Port = SavedData.Port;
                 RconPort = SavedData.RconPort;
                 RconEnabled = SavedData.RconEnabled;
-                maxPlayer = SavedData.maxPlayer;
+                MaxPlayer = SavedData.MaxPlayer;
                 RconPassword = SavedData.RconPassword;
                 CheckInstalledVersion();
                 serverState = ServerState.Stopped;
                 logs = new ServerLog(ServerName);
                 Mods = new ModCollection(logs);
+                cancellationTokenRestart = new CancellationTokenSource();
+
 
                 if (!ServerCollection.MServerCollection.AddServer(this))
                 {
@@ -305,7 +310,12 @@ namespace ArkServer
                 if (true == needsServerUpdate)
                 {
                     Utilities util = new Utilities(this);
-                    await util.ServerStop(30, "Ark update" , true);
+
+                    if (RestartTask.IsCompleted)
+                    {
+                        cancellationTokenRestart = new CancellationTokenSource();
+                        RestartTask = util.ServerStopOrRestart(30, "Ark update", true, cancellationTokenRestart.Token);
+                    }
 
                     needsModUpdate = false;
                 }
@@ -313,22 +323,18 @@ namespace ArkServer
                 if (true == needsModUpdate)
                 {
                     Utilities util = new Utilities(this);
-                    await util.ServerStop(30, " mod update", true);
+
+                    if (RestartTask.IsCompleted)
+                    {
+                        cancellationTokenRestart = new CancellationTokenSource();
+                        RestartTask = util.ServerStopOrRestart(30, "Ark update", true, cancellationTokenRestart.Token);
+                    }
 
                 }
             }
 
 
         }
-
-        public async void RconDebugAsync()
-        {
-            Utilities util = new Utilities(this);
-            await util.ServerStop(0, "test" , true);
-        }
-
-
-
 
         public async void StartServerAsync()
         {
@@ -389,8 +395,11 @@ namespace ArkServer
                Thread.CurrentThread.IsBackground = true;
                do
                {
-                   System.Timers.Timer timer = new System.Timers.Timer(TimeSpan.FromMinutes(5).TotalMilliseconds);
-                   timer.AutoReset = true;
+                   System.Timers.Timer timer = new System.Timers.Timer(TimeSpan.FromMinutes(5).TotalMilliseconds)
+                   {
+                       AutoReset = true
+                   };
+
                    timer.Elapsed += new ElapsedEventHandler(CheckforUpdatesAsync);
 
                    await InitServer();

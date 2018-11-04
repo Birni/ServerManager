@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ServerManagerGUI.ViewModels
+namespace ConsoleApp1
 {
-    class UpdateTimes
+    class Program
     {
+        static void Main(string[] args)
+        {
+        }
     }
 }
