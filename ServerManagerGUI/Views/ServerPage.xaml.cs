@@ -41,13 +41,16 @@ namespace ServerManagerGUI.Views
             var b1 = new Binding("ServerName");
             var b2 = new Binding("InstalledVersion");
             var b3 = new Binding("serverState");
+            var b4 = new Binding("DailyRestartDate");
             b1.Source = mServer;
             b2.Source = mServer;
             b3.Source = mServer;
+            b4.Source = mServer;
 
             Label_ServerName.SetBinding(Label.ContentProperty, b1);
             Version.SetBinding(Label.ContentProperty, b2);
             Label_Status.SetBinding(Label.ContentProperty, b3);
+            DailyRestartSelect.SetBinding(DateTimePicker.SelectedDateProperty, b4);
 
 
             TextBox_ServerName.Text = mServer.ServerName;
@@ -58,6 +61,20 @@ namespace ServerManagerGUI.Views
             TextBox_ServerRconPort.Text = mServer.RconPort.ToString();
             TextBox_ServerStartArgument.Text = mServer.ServerStartArgument.ToString();
             TextBox_ServerRconPassword.Text = mServer.RconPassword;
+
+            RconEnabled_Button.IsChecked = mServer.RconEnabled;
+            AutoUpdateEnabeld_Button.IsChecked = mServer.ArkAutoUpdateIsEnabled;
+            AutoModEnabeld_Button.IsChecked = mServer.ModAutoUpdateIsEnabled;
+            NotifyDiscordEnabeld_Button.IsChecked = mServer.NotifyDiscordIsEnabled;
+            DailyRestartEnabeld_Button.IsChecked = mServer.DailyRestartIsEnabeld;
+            TextBox_Affinity.Text = mServer.Affinity;
+
+            if (mServer.DailyRestartDate != DateTime.MinValue)
+            {
+                DailyRestartSelect.DisplayDate = mServer.DailyRestartDate;
+                DailyRestartSelect.SelectedDate = mServer.DailyRestartDate;
+            }
+
 
             List<string> Restarttimes = new List<string>
             {
@@ -74,12 +91,18 @@ namespace ServerManagerGUI.Views
             RestartTimerButton.ItemsSource = Restarttimes;
             ServerStopTimerButton.ItemsSource = Restarttimes;
 
+         //   DailyRestartSelect.DisplayDate
+
         }
 
         void OnLoad(object sender, RoutedEventArgs e)
         {
             LogGrid.Items.Refresh();
             LogGrid.ItemsSource = mServer.logs.GetLogs();
+
+            DailyRestartSelect.DisplayDate = mServer.DailyRestartDate;
+            DailyRestartSelect.SelectedDate = mServer.DailyRestartDate;
+            
 
         }
 
@@ -117,12 +140,13 @@ namespace ServerManagerGUI.Views
             };
 
 
-            MessageDialogResult result = await metroWindow.ShowMessageAsync("Stop Server!", "Stop server without saving!",
+            MessageDialogResult result = await metroWindow.ShowMessageAsync("Stop Server!", "Stop server without saving or notification!",
                 MessageDialogStyle.AffirmativeAndNegative, mySettings);
 
-            if (result != MessageDialogResult.Affirmative)
+            if (result == MessageDialogResult.Affirmative)
             {
-                //TODO: call Server Stop function
+                Utilities util = new Utilities(mServer);
+                util.ServerStopImmediately();
             }
         }
 
@@ -131,16 +155,23 @@ namespace ServerManagerGUI.Views
             mServer.StartServerHandler();
         }
 
-        private void SaveServer_Click(object sender, RoutedEventArgs e)
+        private async void SaveServer_Click(object sender, RoutedEventArgs e)
         {
-            if (!mServer.RestartTask.IsCompleted)
+            Utilities util = new Utilities(mServer);
+            if (await util.SaveServerAsync())
             {
-                mServer.cancellationTokenRestart.Cancel();
-                mServer.cancellationTokenRestart.Dispose(); ;
+                mServer.logs.AddLog(LogType.Information, "World saved");
+            }
+            else
+            {
+                mServer.logs.AddLog(LogType.Information, "World save failed");
             }
 
-            //        mServer.cancellationTokenRestart.Cancel();
-
+            //if (!mServer.RestartTask.IsCompleted)
+            //{
+            //    mServer.cancellationTokenRestart.Cancel();
+            //    mServer.cancellationTokenRestart.Dispose(); ;
+            //}
         }
 
         private async void DeleteServer_Click(object sender, RoutedEventArgs e)
@@ -182,6 +213,14 @@ namespace ServerManagerGUI.Views
                 mServer.RconPort = Int32.Parse(TextBox_ServerRconPort.Text);
                 mServer.ServerStartArgument = TextBox_ServerStartArgument.Text;
                 mServer.RconPassword = TextBox_ServerRconPassword.Text;
+                mServer.RconEnabled =  (bool) RconEnabled_Button.IsChecked;
+                mServer.ArkAutoUpdateIsEnabled = (bool)AutoUpdateEnabeld_Button.IsChecked;
+                mServer.ModAutoUpdateIsEnabled = (bool)AutoModEnabeld_Button.IsChecked;
+                mServer.NotifyDiscordIsEnabled = (bool)NotifyDiscordEnabeld_Button.IsChecked;
+                mServer.Affinity = TextBox_Affinity.Text;
+                mServer.DailyRestartDate = (DateTime) DailyRestartSelect.DisplayDate;
+                mServer.DailyRestartIsEnabeld = (bool)DailyRestartEnabeld_Button.IsChecked;
+
 
                 if (mServer.ServerName != TextBox_ServerName.Text)
                 {
@@ -226,38 +265,9 @@ namespace ServerManagerGUI.Views
 
         private async void UserBroadcast_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(Broadcast_Textbox.Text))
+            if (mServer.RconEnabled)
             {
-                var metroWindow = (Application.Current.MainWindow as MetroWindow);
-
-                var mySettings = new MetroDialogSettings()
-                {
-                    AnimateShow = true,
-                    AffirmativeButtonText = "OK",
-                    ColorScheme = metroWindow.MetroDialogOptions.ColorScheme
-                };
-
-                MessageDialogResult result = await metroWindow.ShowMessageAsync("No broadcast message", "Please enter a message to broadcast",
-                    MessageDialogStyle.Affirmative, mySettings);
-            }
-            else
-            {
-                if (mServer.serverState == ServerState.Running)
-                {
-                    Utilities util = new Utilities(mServer);
-                    bool successfully = await  util.BroadcastMessageAsync(Broadcast_Textbox.Text);
-
-
-
-                    if (true == NotifyDiscord_Button.IsChecked)
-                    {
-                        Webhook webhook = new Webhook(WebhookDataInterface.MWebhookDataInterface.WebhoockLink);
-                        await webhook.Send("```"+ mServer.ServerName + " broadcast: " + Broadcast_Textbox.Text + "```");
-                    }
-                    Broadcast_Textbox.Text = "";
-
-                }
-                else
+                if (string.IsNullOrEmpty(Broadcast_Textbox.Text))
                 {
                     var metroWindow = (Application.Current.MainWindow as MetroWindow);
 
@@ -268,9 +278,55 @@ namespace ServerManagerGUI.Views
                         ColorScheme = metroWindow.MetroDialogOptions.ColorScheme
                     };
 
-                    MessageDialogResult result = await metroWindow.ShowMessageAsync("Server is not running", "The server has to run to broadcast messages",
+                    MessageDialogResult result = await metroWindow.ShowMessageAsync("No broadcast message", "Please enter a message to broadcast",
                         MessageDialogStyle.Affirmative, mySettings);
                 }
+                else
+                {
+                    if (mServer.serverState == ServerState.Running)
+                    {
+                        Utilities util = new Utilities(mServer);
+                        bool successfully = await util.BroadcastMessageAsync(Broadcast_Textbox.Text);
+
+
+
+                        if (true == NotifyDiscord_Button.IsChecked)
+                        {
+                            Webhook webhook = new Webhook(WebhookDataInterface.MWebhookDataInterface.WebhoockLink);
+                            await webhook.Send("```" + mServer.ServerName + " broadcast: " + Broadcast_Textbox.Text + "```");
+                        }
+                        Broadcast_Textbox.Text = "";
+
+                    }
+                    else
+                    {
+                        var metroWindow = (Application.Current.MainWindow as MetroWindow);
+
+                        var mySettings = new MetroDialogSettings()
+                        {
+                            AnimateShow = true,
+                            AffirmativeButtonText = "OK",
+                            ColorScheme = metroWindow.MetroDialogOptions.ColorScheme
+                        };
+
+                        MessageDialogResult result = await metroWindow.ShowMessageAsync("Server is not running", "The server has to run to broadcast messages",
+                            MessageDialogStyle.Affirmative, mySettings);
+                    }
+                }
+            }
+            else
+            {
+                var metroWindow = (Application.Current.MainWindow as MetroWindow);
+
+                var mySettings = new MetroDialogSettings()
+                {
+                    AnimateShow = true,
+                    AffirmativeButtonText = "OK",
+                    ColorScheme = metroWindow.MetroDialogOptions.ColorScheme
+                };
+
+                MessageDialogResult result = await metroWindow.ShowMessageAsync("Server is disabled", "Enable Server Rcon run to broadcast messages",
+                    MessageDialogStyle.Affirmative, mySettings);
             }
 
 
@@ -406,6 +462,10 @@ namespace ServerManagerGUI.Views
             var value = ((Selector)sender).SelectedValue;
         }
 
+        private void CancelTask_Click(object sender, RoutedEventArgs e)
+        {
+            mServer.CancelRunningRestartOrStop();
+        }
     }
 }
 

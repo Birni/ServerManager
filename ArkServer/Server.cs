@@ -36,6 +36,7 @@ namespace ArkServer
         string _ServerName;
         ServerState _serverState;
         string _InstalledVersion;
+        DateTime _DailyRestartDate;
 
         public string ServerName
         {
@@ -70,6 +71,15 @@ namespace ArkServer
             }
         }
 
+        public DateTime DailyRestartDate 
+        {
+            get { return _DailyRestartDate; }
+            set
+            {
+                _DailyRestartDate = value;
+                OnPropertyChanged("DailyRestartDate");
+            }
+        }
 
 
         public string ArkSurvivalFolder { get; set; } = "C:\\SERVER\\TheIsland";
@@ -82,6 +92,12 @@ namespace ArkServer
         public bool RconEnabled { get; set; } = true;
         public int MaxPlayer { get; set; } = 60;
         public string RconPassword { get; set; } = "password";
+        public bool ArkAutoUpdateIsEnabled { get; set; } = true;
+        public bool ModAutoUpdateIsEnabled { get; set; } = true;
+        public bool NotifyDiscordIsEnabled { get; set; } = true;
+        public bool DailyRestartIsEnabeld { get; set; } = true;
+        public string Affinity { get; set; }
+
 
 
         [NonSerialized()] public ModCollection Mods = null;
@@ -91,6 +107,8 @@ namespace ArkServer
         [NonSerialized()] int DateofUpdate = 0;
         [field: NonSerialized()] public CancellationTokenSource cancellationTokenRestart { get; set; }
         [field: NonSerialized()] public Task RestartTask { get; set; }
+        [NonSerialized()] private System.Threading.Timer timer;
+
 
         public Server(FileInfo file)
         {
@@ -109,6 +127,12 @@ namespace ArkServer
                 RconEnabled = SavedData.RconEnabled;
                 MaxPlayer = SavedData.MaxPlayer;
                 RconPassword = SavedData.RconPassword;
+                ArkAutoUpdateIsEnabled = SavedData.ArkAutoUpdateIsEnabled;
+                ModAutoUpdateIsEnabled = SavedData.ModAutoUpdateIsEnabled;
+                NotifyDiscordIsEnabled = SavedData.NotifyDiscordIsEnabled;
+                Affinity = SavedData.Affinity;
+                DailyRestartDate = SavedData.DailyRestartDate;
+
                 CheckInstalledVersion();
                 serverState = ServerState.Stopped;
                 logs = new ServerLog(ServerName);
@@ -224,6 +248,17 @@ namespace ArkServer
             AppInfo appinfo = new AppInfo();
             appinfo = await DetermieAppInfo();
 
+
+
+            CancelRunningRestartOrStop();
+            cancellationTokenRestart = new CancellationTokenSource();
+
+            if (DailyRestartIsEnabeld)
+            { 
+                SetupDailyRestart();
+            }
+
+
             if (0 != appinfo.timeupdated)
             {
                 DateofUpdate = appinfo.timeupdated;
@@ -232,8 +267,18 @@ namespace ArkServer
             {
                 logs.AddLog(LogType.Critical, "Can not determine current server update time. Updater does not work until next update time check (5min)");
             }
+        }
 
-
+        public void CancelRunningRestartOrStop()
+        {
+            if (null != RestartTask)
+            {
+                if (!RestartTask.IsCompleted)
+                {
+                    cancellationTokenRestart.Cancel();
+                    cancellationTokenRestart.Dispose();
+                }
+            }
         }
 
         public void WatchServer(object sender, EventArgs e)
@@ -266,46 +311,56 @@ namespace ArkServer
                 bool needsServerUpdate = false;
                 bool needsModUpdate = false;
 
-                /*3218646 is public brunch for ark server  */
-                if (0 != appinfo.timeupdated)
+                if (ArkAutoUpdateIsEnabled)
                 {
-                    if ((DateofUpdate != 0) && (DateofUpdate < appinfo.timeupdated))
+                    if (0 != appinfo.timeupdated)
                     {
-                        needsServerUpdate = true;
-                        Webhook webhook = new Webhook(WebhookDataInterface.MWebhookDataInterface.WebhoockLink);
-                        await webhook.Send("```" + ServerName + " Ark server update is available" + "```");
-                        logs.AddLog(LogType.Information, "Ark server update is available");
-                    }
-                    else
-                    {
-                        logs.AddLog(LogType.Information, "Ark server is up to date");
+                        if ((DateofUpdate != 0) && (DateofUpdate < appinfo.timeupdated))
+                        {
+                            needsServerUpdate = true;
+                            if (NotifyDiscordIsEnabled)
+                            {
+                                Webhook webhook = new Webhook(WebhookDataInterface.MWebhookDataInterface.WebhoockLink);
+                                await webhook.Send("```" + ServerName + " Ark server update is available" + "```");
+                            }
+                            logs.AddLog(LogType.Information, "Ark server update is available");
+                        }
+                        else
+                        {
+                            logs.AddLog(LogType.Information, "Ark server is up to date");
+                        }
+
+                        if ((DateofUpdate != 0))
+                        {
+                            DateofUpdate = appinfo.timeupdated;
+                        }
                     }
 
-                    if ((DateofUpdate != 0))
+                    if ((DateofUpdate == 0) && (DateofUpdate == 0))
                     {
-                        DateofUpdate = appinfo.timeupdated;
+                        logs.AddLog(LogType.Critical, "Can not determine current server update time. Updater does not work until next update time check (5min)");
                     }
                 }
 
-                if ((DateofUpdate == 0) && (DateofUpdate == 0))
+                if (ModAutoUpdateIsEnabled)
                 {
-                    logs.AddLog(LogType.Critical, "Can not determine current server update time. Updater does not work until next update time check (5min)");
-                }
+                    List<string> list = new List<string>();
+                    List<string> updatelist = await Mods.CheckModsForUpdates();
 
-                List<string> list = new List<string>();
-                List<string> updatelist = await Mods.CheckModsForUpdates();
-
-                if (updatelist.Count > 0)
-                {
-                    Webhook webhook = new Webhook(WebhookDataInterface.MWebhookDataInterface.WebhoockLink);
-                    foreach (var mod in updatelist)
+                    if (updatelist.Count > 0)
                     {
-                        await webhook.Send("```" + ServerName + " Mod: " + mod + " needs a update" + "```");
+                        if (NotifyDiscordIsEnabled)
+                        {
+                            Webhook webhook = new Webhook(WebhookDataInterface.MWebhookDataInterface.WebhoockLink);
+                            foreach (var mod in updatelist)
+                            {
+                                await webhook.Send("```" + ServerName + " Mod: " + mod + " needs a update" + "```");
+                            }
+                        }
+
+                        needsModUpdate = true;
                     }
-
-                    needsModUpdate = true;
                 }
-
 
                 if (true == needsServerUpdate)
                 {
@@ -332,9 +387,48 @@ namespace ArkServer
 
                 }
             }
-
-
         }
+
+        private void SetupDailyRestart()
+        {
+            DateTime current = DateTime.Now;
+            TimeSpan timeToGo = DailyRestartDate - current;
+            if (timeToGo < TimeSpan.Zero)
+            {
+                logs.AddLog(LogType.Information, "Daily Restart: time already passed. Take date in feature");
+            }
+            else
+            {
+                timer = new System.Threading.Timer(x =>
+                {
+                    Utilities util = new Utilities(this);
+                    RestartTask = util.ServerStopOrRestart(60, "Daily restart", true, cancellationTokenRestart.Token);
+                    DailyRestartDate = DailyRestartDate.AddDays(1);
+                    logs.AddLog(LogType.Information, "Daily Restart: next daily restart "+ DailyRestartDate);
+                    SaveToFile();
+                    SetupDailyRestart();
+                }, null, timeToGo, Timeout.InfiniteTimeSpan);
+            }
+        }
+
+
+        public bool CheckIfAlreayRunning(out Process process)
+        {
+            bool result = false;
+            process = null;
+            foreach (Process proc in System.Diagnostics.Process.GetProcesses())
+            {
+                if (proc.MainWindowTitle.Contains(ArkSurvivalFolder))
+                {
+
+                        process = proc;
+                        result = true;
+                    
+                }
+            }
+            return result;
+        }
+
 
         public async void StartServerAsync()
         {
@@ -349,14 +443,31 @@ namespace ArkServer
             serverState = ServerState.Running;
 
 
-            System.Timers.Timer timer = new System.Timers.Timer(TimeSpan.FromSeconds(20).TotalMilliseconds);
-            timer.AutoReset = true;
+            System.Timers.Timer timer = new System.Timers.Timer(TimeSpan.FromSeconds(20).TotalMilliseconds)
+            {
+                AutoReset = true
+            };
+
             timer.Elapsed += new ElapsedEventHandler(WatchServer);
 
-            ArkProcess.Start();
+            if (true == CheckIfAlreayRunning(out Process temp))
+            {
+                ArkProcess = temp;
+            }
+            else
+            {
+                ArkProcess.Start();
+            }
+
             TotalProcessTime = TimeSpan.Zero;
             numOfTimeOuts = 0;
             timer.Start();
+            ArkProcess.PriorityClass = ProcessPriorityClass.High;
+            if (!String.IsNullOrEmpty(Affinity))
+            {
+                ArkProcess.ProcessorAffinity = (IntPtr)Int32.Parse(Affinity);
+            }
+
             ArkProcess.WaitForExit();
             timer.Stop();
             ArkProcess.Close();
@@ -367,7 +478,10 @@ namespace ArkServer
                 Webhook webhook = new Webhook(WebhookDataInterface.MWebhookDataInterface.WebhoockLink);
                 serverState = ServerState.Crashed;
                 logs.AddLog(LogType.Critical, "Server crashed");
-                await webhook.Send("```" + ServerName + ": Opps the server crashed!! A team of highly trained jerboas has been dispatched to deal with this situation. Please stay calm!" + "```");
+                if (NotifyDiscordIsEnabled)
+                {
+                    await webhook.Send("```" + ServerName + ": Opps the server crashed!! A team of highly trained jerboas has been dispatched to deal with this situation. Please stay calm!" + "```");
+                }
             }
         }
 
@@ -387,9 +501,11 @@ namespace ArkServer
             logs.AddLog(LogType.Information, "Server update finished");
             CheckInstalledVersion();
         }
+
+
         public void StartServerHandler()
         {
-            Webhook webhook = new Webhook(WebhookDataInterface.MWebhookDataInterface.WebhoockLink);
+ 
             new Thread(async () =>
            {
                Thread.CurrentThread.IsBackground = true;
@@ -402,10 +518,24 @@ namespace ArkServer
 
                    timer.Elapsed += new ElapsedEventHandler(CheckforUpdatesAsync);
 
-                   await InitServer();
-                   UpdateServer();
+                   Task init = InitServer();
+                   Task.WaitAny(init);
+
+                   if (CheckIfAlreayRunning(out Process temp))
+                   {
+                       logs.AddLog(LogType.Information, "Server is already running. Assuming that server version and Mods are up to date");
+                   }
+                   else
+                   {
+                       UpdateServer();
+
+                       if (NotifyDiscordIsEnabled)
+                       {
+                           Webhook webhook = new Webhook(WebhookDataInterface.MWebhookDataInterface.WebhoockLink);
+                           await webhook.Send("```" + ServerName + ": Server is booting. The server should running in few moments." + "```");
+                       }
+                   }
                    timer.Start();
-                   await webhook.Send("```"+ServerName + ": Server is booting. The server should running in few moments." + "```");
                    StartServerAsync();
                    timer.Stop();
 

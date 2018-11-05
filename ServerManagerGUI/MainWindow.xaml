@@ -9,8 +9,8 @@
                  xmlns:views="clr-namespace:ServerManagerGUI.Views"
                  xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
                  Title="Salty Bay Server Manager"
-                 Width="1200"
-                 Height="800"
+                 Width="1400"
+                 Height="930"
                  WindowStartupLocation="CenterScreen"
                  WindowTransitionsEnabled="False"
                  mc:Ignorable="d">

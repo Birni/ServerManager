@@ -21,28 +21,51 @@ namespace ArkServer.ServerUtilities
 
         public async Task<bool> BroadcastMessageAsync(string message)
         {
-            INetworkSocket socket = new RconSocket();
-            RconMessenger messenger = new RconMessenger(socket);
-            string response = null;
+            bool result = false;
 
-            await messenger.ConnectAsync(mServer.ServerIp, mServer.RconPort);
-
-            bool authenticated = await messenger.AuthenticateAsync(mServer.RconPassword);
-            if (authenticated)
+            if (mServer.RconEnabled)
             {
-                response = await messenger.ExecuteCommandAsync("broadcast " + message);
-            }
+                INetworkSocket socket = new RconSocket();
+                RconMessenger messenger = new RconMessenger(socket);
+                string response = null;
 
-            messenger.CloseConnection();
+                try
+                {
+                    await messenger.ConnectAsync(mServer.ServerIp, mServer.RconPort);
 
-            if (response.Contains("Server received, But no response!!"))
-            {
-                return true;
+                    bool authenticated = await messenger.AuthenticateAsync(mServer.RconPassword);
+
+                    if (authenticated)
+                    {
+                        response = await messenger.ExecuteCommandAsync("broadcast " + message);
+                    }
+                    else
+                    {
+                        mServer.logs.AddLog(LogType.Critical, "Rcon: Can not authenticate");
+                    }
+
+                    messenger.CloseConnection();
+
+                    if (response.Contains("Server received, But no response!!"))
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                }
+                catch
+                {
+                    mServer.logs.AddLog(LogType.Critical, "Rcon: Can not connect to Rcon");
+                }
+
             }
             else
             {
-                return false;
+                mServer.logs.AddLog(LogType.Information, "Rcon Error: Rcon disabled. Can not broadcast message: " + message);
             }
+            return result;
         }
 
 
@@ -73,8 +96,16 @@ namespace ArkServer.ServerUtilities
 
         }
 
-        public async Task ServerStopOrRestart(int TimeInMin, string reason, bool restartagain, CancellationToken cancellationToken)
+        public void ServerStopImmediately()
         {
+            mServer.serverState = ServerState.Stopped;
+            mServer.logs.AddLog(LogType.Information, "Server stopped by user" );
+            mServer.ArkProcess.Kill();
+        }
+
+
+            public async Task ServerStopOrRestart(int TimeInMin, string reason, bool restartagain, CancellationToken cancellationToken)
+            {
             if (mServer != null)
             {
                 Webhook webhook = new Webhook(WebhookDataInterface.MWebhookDataInterface.WebhoockLink);
@@ -109,8 +140,11 @@ namespace ArkServer.ServerUtilities
 
                     if (TimeInMin >= 60)
                     {
-                        await webhook.Send(string.Format(discordnotification, 60));
-                        firstannouncementgiven = true;
+                        if (mServer.NotifyDiscordIsEnabled)
+                        {
+                            await webhook.Send(string.Format(discordnotification, 60));
+                            firstannouncementgiven = true;
+                        }
                         await BroadcastMessageAsync(string.Format(broadcastmessage, 60));
                         mServer.logs.AddLog(LogType.Information, string.Format(broadcastmessage, 60));
 
@@ -128,7 +162,7 @@ namespace ArkServer.ServerUtilities
 
                     if (TimeInMin >= 45)
                     {
-                        if (!firstannouncementgiven)
+                        if (!firstannouncementgiven && mServer.NotifyDiscordIsEnabled)
                         {
                             await webhook.Send(string.Format(discordnotification, 45));
                             firstannouncementgiven = true;
@@ -150,7 +184,7 @@ namespace ArkServer.ServerUtilities
 
                     if (TimeInMin >= 30)
                     {
-                        if (!firstannouncementgiven)
+                        if (!firstannouncementgiven && mServer.NotifyDiscordIsEnabled)
                         {
                             await webhook.Send(string.Format(discordnotification, 30));
                             firstannouncementgiven = true;
@@ -170,9 +204,9 @@ namespace ArkServer.ServerUtilities
                         }
                     }
 
-                    if (TimeInMin >= 15)
+                    if (TimeInMin >= 15 )
                     {
-                        if (!firstannouncementgiven)
+                        if (!firstannouncementgiven && mServer.NotifyDiscordIsEnabled)
                         {
                             await webhook.Send(string.Format(discordnotification, 15));
                             firstannouncementgiven = true;
@@ -195,7 +229,7 @@ namespace ArkServer.ServerUtilities
 
                     if (TimeInMin >= 10)
                     {
-                        if (!firstannouncementgiven)
+                        if (!firstannouncementgiven && mServer.NotifyDiscordIsEnabled)
                         {
                             await webhook.Send(string.Format(discordnotification, 10));
                             firstannouncementgiven = true;
@@ -217,7 +251,7 @@ namespace ArkServer.ServerUtilities
 
                     if (TimeInMin >= 5)
                     {
-                        if (!firstannouncementgiven)
+                        if (!firstannouncementgiven && mServer.NotifyDiscordIsEnabled)
                         {
                             await webhook.Send(string.Format(discordnotification, 5));
                             firstannouncementgiven = true;
@@ -239,7 +273,7 @@ namespace ArkServer.ServerUtilities
 
                     if (TimeInMin >= 1)
                     {
-                        if (!firstannouncementgiven)
+                        if (!firstannouncementgiven && mServer.NotifyDiscordIsEnabled)
                         {
                             await webhook.Send(string.Format(discordnotification, 1));
                             firstannouncementgiven = true;
@@ -290,7 +324,10 @@ namespace ArkServer.ServerUtilities
                 {
                     await webhook.Send(canceldiscordnotification);
                     await BroadcastMessageAsync(cancelbroadcastmessage);
-                    mServer.logs.AddLog(LogType.Information, cancelbroadcastmessage);
+                    if (mServer.NotifyDiscordIsEnabled)
+                    {
+                        mServer.logs.AddLog(LogType.Information, cancelbroadcastmessage);
+                    }
 
                     mServer.serverState = ServerState.Running;
                 }

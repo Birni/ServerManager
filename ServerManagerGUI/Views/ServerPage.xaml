@@ -6,8 +6,8 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
       xmlns:Views="clr-namespace:ServerManagerGUI.Views"
-      d:DesignHeight="500"
-      d:DesignWidth="800"
+      d:DesignHeight="1200"
+      d:DesignWidth="1400"
       mc:Ignorable="d"
       Loaded="OnLoad">
 
@@ -95,6 +95,10 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <StackPanel Grid.Row="0" VerticalAlignment="Center">
@@ -146,7 +150,7 @@
                         <GroupBox Header="Broadcast" Height="65" VerticalAlignment="Top" Padding="5,0">
                             <Grid>
                                 <Grid Width="auto" VerticalAlignment="Center" HorizontalAlignment="Stretch">
-                                    <TextBox x:Name="Broadcast_Textbox" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="0,0,220,0"/>
+                                    <TextBox x:Name="Broadcast_Textbox" VerticalAlignment="Center"  Margin="0,0,220,0"/>
                                 </Grid>
 
                                 <Grid Width="auto" VerticalAlignment="Center" HorizontalAlignment="Right">
@@ -197,6 +201,10 @@
                     <StackPanel Grid.Row="3" VerticalAlignment="Center" Margin="0,10,0,0">
                         <GroupBox Header="Server Stop" Height="90">
                             <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="81*"/>
+                                    <ColumnDefinition Width="497*"/>
+                                </Grid.ColumnDefinitions>
                                 <Grid Grid.ColumnSpan="2">
                                     <Label Content="Stop reason:" VerticalAlignment="Center" FontSize="15" />
                                 </Grid>
@@ -230,19 +238,30 @@
                             </Grid>
                         </GroupBox>
                     </StackPanel>
-                    
+
+                    <StackPanel Grid.Row="4" VerticalAlignment="Center" Margin="0,10,0,0">
+                        <GroupBox Header="Cancel Running Task" Height="90">
+
+                            <Grid>
+                                
+                                <Grid Grid.ColumnSpan="2">
+                                    <Label Content="Cancel a running restart or stop task " VerticalAlignment="Center" FontSize="15" />
+                                </Grid>
+
+                                <Grid Width="auto" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                    <Button Click="CancelTask_Click" Content="Cancel" HorizontalAlignment="Right" Width="75"  Margin="0,0,100,0"/>
+                                </Grid>
+                            </Grid>
+
+                        </GroupBox>
+                    </StackPanel>
+
                 </Grid>
             </TabItem>
 
             <TabItem Header="Settings">
                 <Grid Margin="10,10,10,10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
@@ -252,129 +271,254 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                        <Label Content="Server name:" Style="{DynamicResource DescriptionHeaderStyle}" />
+                    <StackPanel Grid.Row="0" VerticalAlignment="Center"  Margin="0,10,0,0">
+                        <GroupBox Header="Name and Path" Height="auto" VerticalAlignment="Center">
+                            <Grid Margin="0,0,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="140" />
+                                    <ColumnDefinition Width="auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Height="auto">
+                                    <Label Content="Server Name:" Style="{DynamicResource DescriptionSettingsStyle}" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Width="500">
+                                    <TextBox x:Name="TextBox_ServerName" Text="awsome Server" VerticalAlignment="Center" Margin="0,0,0,0" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" Grid.Column="0"  VerticalAlignment="Center" Height="auto">
+                                    <Label Content="Path to Server:" Style="{DynamicResource DescriptionSettingsStyle}" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Height="auto">
+                                    <TextBox x:Name="TextBox_ServerPath" Text="C:/Server/myServer" VerticalAlignment="Center" Margin="0,0,1,0"/>
+                                </StackPanel>
+                            </Grid>
+                        </GroupBox>
                     </StackPanel>
 
-                    <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">
-                        <TextBox x:Name="TextBox_ServerName" Text="awesome server" VerticalAlignment="Center" Margin="2,2,2,2">
-                            <TextBox.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Header="This is only a Test-Item" />
-                                </ContextMenu>
-                            </TextBox.ContextMenu>
-                        </TextBox>
+                    <StackPanel Grid.Row="1" VerticalAlignment="Center"  Margin="0,10,0,0">
+                        <GroupBox Header="Auto Management" Height="auto" VerticalAlignment="Center">
+                            <Grid Margin="0,0,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" Height="auto" Width="300">
+                                    <Grid Margin="0,0,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="auto" />
+                                            <ColumnDefinition Width="auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left">
+                                            <Label Content="Auto Ark Update:" Style="{DynamicResource DescriptionSettingsStyle}" />
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left">
+                                            <CheckBox x:Name="AutoUpdateEnabeld_Button" Content="enabled" IsChecked="True" HorizontalAlignment="Left" Width="auto" Margin="0,0,0,0" />
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Width="300">
+                                    <Grid Margin="0,0,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="auto" />
+                                            <ColumnDefinition Width="auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left">
+                                            <Label Content="Auto Mod Update:" Style="{DynamicResource DescriptionSettingsStyle}" />
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left">
+                                            <CheckBox x:Name="AutoModEnabeld_Button" Content="enabled" IsChecked="True" HorizontalAlignment="Left" Width="auto" Margin="0,0,0,0" />
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+
+                                <StackPanel  Grid.Column="2"  VerticalAlignment="Center" HorizontalAlignment="Left" Height="auto" Width="300">
+                                    <Grid Margin="0,0,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="auto" />
+                                            <ColumnDefinition Width="auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left">
+                                            <Label Content="Notify Discord:" Style="{DynamicResource DescriptionSettingsStyle}" />
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left">
+                                            <CheckBox x:Name="NotifyDiscordEnabeld_Button" Content="enabled" IsChecked="True" HorizontalAlignment="Left" Width="auto" Margin="0,0,0,0" />
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+
+                                <StackPanel  Grid.Column="3"  VerticalAlignment="Center" HorizontalAlignment="Left" Height="auto" >
+                                    <Grid Margin="0,0,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="auto" />
+                                            <ColumnDefinition Width="auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left">
+                                            <Label Content="Affinity:" Style="{DynamicResource DescriptionSettingsStyle}" />
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Width="100">
+                                            <TextBox x:Name="TextBox_Affinity" Text="" VerticalAlignment="Center" Margin="0,0,0,0" />
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
+                        </GroupBox>
                     </StackPanel>
 
-                    <StackPanel Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">
-                        <Label Content="Path to Server:" Style="{DynamicResource DescriptionHeaderStyle}" />
+                    <StackPanel Grid.Row="2" VerticalAlignment="Center"  Margin="0,10,0,0">
+                        <GroupBox Header="Network" Height="auto" VerticalAlignment="Center">
+                            <Grid Margin="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="140" />
+                                    <ColumnDefinition Width="auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Height="auto">
+                                    <Label Content="Server IP:" Style="{DynamicResource DescriptionSettingsStyle}" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Stretch"  Width="500">
+                                    <TextBox x:Name="TextBox_ServerIp" Text="185.38.149.15" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="0,0,0,0"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" Grid.Column="0"  VerticalAlignment="Center" Height="auto">
+                                    <Label Content="Querry Port:" Style="{DynamicResource DescriptionSettingsStyle}" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Height="auto">
+                                    <TextBox x:Name="TextBox_ServerQuerryPort" Text="37015" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="0,0,0,0"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="2" Grid.Column="0"  VerticalAlignment="Center" Height="auto">
+                                    <Label Content="Server Port:" Style="{DynamicResource DescriptionSettingsStyle}" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Height="auto">
+                                    <TextBox x:Name="TextBox_ServerPort" Text="9999" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="0,0,0,0"/>
+                                </StackPanel>
+                            </Grid>
+                        </GroupBox>
                     </StackPanel>
 
-                    <StackPanel Grid.Row="1" Grid.Column="1" VerticalAlignment="Center">
-                        <TextBox x:Name="TextBox_ServerPath" Text="Path to Server" VerticalAlignment="Center" Margin="2,2,2,2">
-                            <TextBox.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Header="This is only a Test-Item" />
-                                </ContextMenu>
-                            </TextBox.ContextMenu>
-                        </TextBox>
+                    <StackPanel Grid.Row="3" VerticalAlignment="Center"  Margin="0,10,0,0">
+                        <GroupBox Header="Rcon" Height="auto" VerticalAlignment="Center">
+                            <Grid Margin="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="140" />
+                                    <ColumnDefinition Width="auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Height="auto">
+                                    <Label Content="Rcon enabled:" Style="{DynamicResource DescriptionSettingsStyle}" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" Height="auto"  Width="500">
+                                    <CheckBox x:Name="RconEnabled_Button" Content="enabled" IsChecked="True" HorizontalAlignment="Left" Width="200" Margin="0,0,0,0" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" Grid.Column="0"  VerticalAlignment="Center" Height="auto">
+                                    <Label Content="Rcon Port:" Style="{DynamicResource DescriptionSettingsStyle}" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Height="auto">
+                                    <TextBox x:Name="TextBox_ServerRconPort" Text="37016" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="0,0,0,0"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="2" Grid.Column="0"  VerticalAlignment="Center" Height="auto">
+                                    <Label Content="Rcon Password:" Style="{DynamicResource DescriptionSettingsStyle}" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Height="auto">
+                                    <TextBox x:Name="TextBox_ServerRconPassword" Text="password" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="0,0,0,0"/>
+                                </StackPanel>
+                            </Grid>
+                        </GroupBox>
                     </StackPanel>
 
-                    <StackPanel Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">
-                        <Label Content="Server Ip:" Style="{DynamicResource DescriptionHeaderStyle}" />
+
+                    <StackPanel Grid.Row="4" VerticalAlignment="Center" Margin="0,10,0,0">
+                        <GroupBox Header="Daily restart" >
+                            <Grid Margin="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Height="auto">
+                                    <Controls:DateTimePicker Controls:TextBoxHelper.UseFloatingWatermark="True" x:Name="DailyRestartSelect" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left">
+                                    <CheckBox x:Name="DailyRestartEnabeld_Button" Content="enabled" IsChecked="True" HorizontalAlignment="Left" Width="auto" Margin="20,0,0,0" />
+                                </StackPanel>
+
+                            </Grid>
+
+                        </GroupBox>
                     </StackPanel>
 
-                    <StackPanel Grid.Row="2" Grid.Column="1" VerticalAlignment="Center">
-                        <TextBox x:Name="TextBox_ServerIp" Text="185.38.149.15" VerticalAlignment="Center" Margin="2,2,2,2">
-                            <TextBox.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Header="This is only a Test-Item" />
-                                </ContextMenu>
-                            </TextBox.ContextMenu>
-                        </TextBox>
+                    <StackPanel Grid.Row="5" VerticalAlignment="Center"  Margin="0,10,0,0">
+                        <GroupBox Header="" Height="auto" VerticalAlignment="Center">
+                            <Grid Margin="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Height="auto">
+                                    <Label Content="Start Argment:" Style="{DynamicResource DescriptionSettingsStyle}" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center"  HorizontalAlignment="Left" Width="900">
+                                    <TextBox x:Name="TextBox_ServerStartArgument" Text="Ragnarok?QueryPort=27015?MultiHome=185.38.149.15?RCONEnabled=true?RCONPort=32330?MaxPlayers=120?TribeLogDestroyedEnemyStructures=true?Port=7777?UseOptimizedHarvestingHealth=true?ForceAllStructureLocking=true?ServerCrosshair=True?listen -ClusterDirOverride=C:\SERVER\Ark_ServerX10\clusters -NoTransferFromFiltering -clusterid=2017ARK -automanagedmods -UseBattlEye -nosteamclient -AutoDestroyStructures -game -server -ForceRespawnDinos -log -servergamelog -servergamelogincludetribelogs" VerticalAlignment="Center" Margin="2"/>
+                                </StackPanel>
+
+                            </Grid>
+                        </GroupBox>
                     </StackPanel>
 
-                    <StackPanel Grid.Row="3" Grid.Column="0" VerticalAlignment="Center">
-                        <Label Content="Server Querryport:" Style="{DynamicResource DescriptionHeaderStyle}" />
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="3" Grid.Column="1" VerticalAlignment="Center">
-                        <TextBox x:Name="TextBox_ServerQuerryPort" Text="37015" VerticalAlignment="Center" Margin="2,2,2,2">
-                            <TextBox.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Header="This is only a Test-Item" />
-                                </ContextMenu>
-                            </TextBox.ContextMenu>
-                        </TextBox>
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="4" Grid.Column="0" VerticalAlignment="Center">
-                        <Label Content="Server RconPort:" Style="{DynamicResource DescriptionHeaderStyle}" />
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="4" Grid.Column="1" VerticalAlignment="Center">
-                        <TextBox x:Name="TextBox_ServerRconPort" Text="37016" VerticalAlignment="Center" Margin="2,2,2,2">
-                            <TextBox.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Header="This is only a Test-Item" />
-                                </ContextMenu>
-                            </TextBox.ContextMenu>
-                        </TextBox>
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="5" Grid.Column="0" VerticalAlignment="Center">
-                        <Label Content="Rcon Password:" Style="{DynamicResource DescriptionHeaderStyle}" />
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="5" Grid.Column="1" VerticalAlignment="Center">
-                        <TextBox x:Name="TextBox_ServerRconPassword" Text="Password" VerticalAlignment="Center" Margin="2,2,2,2">
-                            <TextBox.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Header="This is only a Test-Item" />
-                                </ContextMenu>
-                            </TextBox.ContextMenu>
-                        </TextBox>
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="6" Grid.Column="0" VerticalAlignment="Center">
-                        <Label Content="Server Port:" Style="{DynamicResource DescriptionHeaderStyle}" />
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="6" Grid.Column="1" VerticalAlignment="Center">
-                        <TextBox x:Name="TextBox_ServerPort" Text="9999" VerticalAlignment="Center" Margin="2,2,2,2">
-                            <TextBox.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Header="This is only a Test-Item" />
-                                </ContextMenu>
-                            </TextBox.ContextMenu>
-                        </TextBox>
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="7" Grid.Column="0" VerticalAlignment="Center">
-                        <Label Content="Start argment:" Style="{DynamicResource DescriptionHeaderStyle}" />
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="7" Grid.Column="1" VerticalAlignment="Center">
-                        <TextBox x:Name="TextBox_ServerStartArgument" Text="Ragnarok?QueryPort=27015?MultiHome=185.38.149.15?RCONEnabled=true?RCONPort=32330?MaxPlayers=120?TribeLogDestroyedEnemyStructures=true?Port=7777?UseOptimizedHarvestingHealth=true?ForceAllStructureLocking=true?ServerCrosshair=True?listen -ClusterDirOverride=C:\SERVER\Ark_ServerX10\clusters -NoTransferFromFiltering -clusterid=2017ARK -automanagedmods -UseBattlEye -nosteamclient -AutoDestroyStructures -game -server -ForceRespawnDinos -log -servergamelog -servergamelogincludetribelogs " VerticalAlignment="Center" Margin="2,2,2,2">
-                            <TextBox.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Header="This is only a Test-Item" />
-                                </ContextMenu>
-                            </TextBox.ContextMenu>
-                        </TextBox>
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="8" Grid.Column="1" VerticalAlignment="Center">
+                    <StackPanel Grid.Row="6" VerticalAlignment="Center"  Margin="0,10,0,0">
                         <Grid Margin="10,10,10,10">
                             <Button Click="ServerSettingsSave_Click" Content="Save" HorizontalAlignment="Right" Width="75"  Margin="0,0,0,0"/>
                         </Grid>
                     </StackPanel>
+                    
                 </Grid>
-
-
             </TabItem>
-
-
         </Controls:MetroAnimatedTabControl>
 
     </Grid>
