@@ -297,6 +297,14 @@ namespace ArkServer
         {
             if (serverState != ServerState.Stopped)
             {
+                if (null != ArkProcess)
+                {
+                    if (ArkProcess.HasExited)
+                    {
+                        ArkProcess_ExitedAsync(null, new EventArgs());
+                    }
+                }
+
                 if (Directory.Exists(Path.Combine(ArkSurvivalFolder, "ShooterGame", "Saved", "Logs")))
                 {
                     DirectoryInfo d = new DirectoryInfo(Path.Combine(ArkSurvivalFolder, "ShooterGame", "Saved", "Logs"));
