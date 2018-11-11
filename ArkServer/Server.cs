@@ -103,11 +103,24 @@ namespace ArkServer
         [NonSerialized()] public ModCollection Mods = null;
         [NonSerialized()] public ServerLog logs = null;
         [NonSerialized()] TimeSpan TotalProcessTime = TimeSpan.Zero;
-        [NonSerialized()] int numOfTimeOuts = 0;
+        [NonSerialized()] DateTime LastDmpCheckTime = DateTime.MinValue;
         [NonSerialized()] int DateofUpdate = 0;
         [field: NonSerialized()] public CancellationTokenSource cancellationTokenRestart { get; set; }
         [field: NonSerialized()] public Task RestartTask { get; set; }
-        [NonSerialized()] private System.Threading.Timer timer;
+        [NonSerialized()] private System.Threading.Timer TimerDailyRestart;
+
+        [NonSerialized()] System.Timers.Timer TimerUpdateCheck = new System.Timers.Timer(TimeSpan.FromMinutes(5).TotalMilliseconds)
+        {
+            AutoReset = true
+        };
+
+        [NonSerialized()] System.Timers.Timer TimerServerCrash = new System.Timers.Timer(TimeSpan.FromSeconds(20).TotalMilliseconds)
+        {
+            AutoReset = true
+        };
+        
+
+
 
 
         public Server(FileInfo file)
@@ -248,8 +261,6 @@ namespace ArkServer
             AppInfo appinfo = new AppInfo();
             appinfo = await DetermieAppInfo();
 
-
-
             CancelRunningRestartOrStop();
             cancellationTokenRestart = new CancellationTokenSource();
 
@@ -281,25 +292,33 @@ namespace ArkServer
             }
         }
 
-        public void WatchServer(object sender, EventArgs e)
+
+        private void WatchServer(object sender, EventArgs e)
         {
-            var newtotalTime = ArkProcess.TotalProcessorTime;
-
-            if (TotalProcessTime == newtotalTime)
+            if (serverState != ServerState.Stopped)
             {
-                logs.AddLog(LogType.Developer, "Server timeout");
-                numOfTimeOuts++;
+                if (Directory.Exists(Path.Combine(ArkSurvivalFolder, "ShooterGame", "Saved", "Logs")))
+                {
+                    DirectoryInfo d = new DirectoryInfo(Path.Combine(ArkSurvivalFolder, "ShooterGame", "Saved", "Logs"));
+
+                    foreach (var file in d.GetFiles("*.dmp"))
+                    {
+                        /* a dump file exists and is older then the last check */
+                        if (file.LastWriteTime > LastDmpCheckTime)
+                        {
+                            if (serverState != ServerState.Stopped)
+                            {
+                                if (null != ArkProcess)
+                                {
+                                    ArkProcess.Kill();
+                                    serverState = ServerState.Crashed;
+                                }
+                            }
+                        }
+                    }
+                    LastDmpCheckTime = DateTime.Now;
+                }
             }
-
-
-            if (numOfTimeOuts > 5)
-            {
-                logs.AddLog(LogType.Critical, "Process killed ");
-                ArkProcess.Kill();
-            }
-
-            TotalProcessTime = newtotalTime;
-
         }
 
         public async void CheckforUpdatesAsync(object sender, EventArgs e)
@@ -321,7 +340,7 @@ namespace ArkServer
                             if (NotifyDiscordIsEnabled)
                             {
                                 Webhook webhook = new Webhook(WebhookDataInterface.MWebhookDataInterface.WebhoockLink);
-                                await webhook.Send("```" + ServerName + " Ark server update is available" + "```");
+                                await webhook.Send("```" + ServerName + ": Ark server update is available" + "```");
                             }
                             logs.AddLog(LogType.Information, "Ark server update is available");
                         }
@@ -351,10 +370,11 @@ namespace ArkServer
                     {
                         if (NotifyDiscordIsEnabled)
                         {
-                            Webhook webhook = new Webhook(WebhookDataInterface.MWebhookDataInterface.WebhoockLink);
-                            foreach (var mod in updatelist)
+                            foreach (string modname in updatelist)
                             {
-                                await webhook.Send("```" + ServerName + " Mod: " + mod + " needs a update" + "```");
+                                Webhook webhook = new Webhook(WebhookDataInterface.MWebhookDataInterface.WebhoockLink);
+                                await webhook.Send("```" + ServerName + ": " + modname + " update is available" + "```");
+                                logs.AddLog(LogType.Information, modname + " update is available");
                             }
                         }
 
@@ -399,7 +419,7 @@ namespace ArkServer
             }
             else
             {
-                timer = new System.Threading.Timer(x =>
+                TimerDailyRestart = new System.Threading.Timer(x =>
                 {
                     Utilities util = new Utilities(this);
                     RestartTask = util.ServerStopOrRestart(60, "Daily restart", true, cancellationTokenRestart.Token);
@@ -412,66 +432,11 @@ namespace ArkServer
         }
 
 
-        public bool CheckIfAlreayRunning(out Process process)
+        // Handle Exited event and display process information.
+        private async void ArkProcess_ExitedAsync(object sender, EventArgs e)
         {
-            bool result = false;
-            process = null;
-            foreach (Process proc in System.Diagnostics.Process.GetProcesses())
-            {
-                if (proc.MainWindowTitle.Contains(ArkSurvivalFolder))
-                {
-
-                        process = proc;
-                        result = true;
-                    
-                }
-            }
-            return result;
-        }
-
-
-        public async void StartServerAsync()
-        {
-            ArkProcess = new Process();
-            ArkProcess.StartInfo.FileName = Path.Combine(ArkSurvivalFolder  ,"ShooterGame" , "Binaries" , "Win64" , "ShooterGameServer.exe");
-            ArkProcess.StartInfo.Arguments = ServerStartArgument + " ";
-            //ArkProcess.StartInfo.UseShellExecute = true;
-            //ArkProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-
-
-            logs.AddLog(LogType.Information, "Starting server");
-            serverState = ServerState.Running;
-
-
-            System.Timers.Timer timer = new System.Timers.Timer(TimeSpan.FromSeconds(20).TotalMilliseconds)
-            {
-                AutoReset = true
-            };
-
-            timer.Elapsed += new ElapsedEventHandler(WatchServer);
-
-            if (true == CheckIfAlreayRunning(out Process temp))
-            {
-                ArkProcess = temp;
-            }
-            else
-            {
-                ArkProcess.Start();
-            }
-
-            TotalProcessTime = TimeSpan.Zero;
-            numOfTimeOuts = 0;
-            timer.Start();
-            ArkProcess.PriorityClass = ProcessPriorityClass.High;
-            if (!String.IsNullOrEmpty(Affinity))
-            {
-                ArkProcess.ProcessorAffinity = (IntPtr)Int32.Parse(Affinity);
-            }
-
-            ArkProcess.WaitForExit();
-            timer.Stop();
-            ArkProcess.Close();
-
+            TimerUpdateCheck.Stop();
+            TimerServerCrash.Stop();
 
             if (serverState != ServerState.Stopped)
             {
@@ -482,6 +447,61 @@ namespace ArkServer
                 {
                     await webhook.Send("```" + ServerName + ": Opps the server crashed!! A team of highly trained jerboas has been dispatched to deal with this situation. Please stay calm!" + "```");
                 }
+
+                StartServerHandler();
+            }
+
+
+        }
+
+        public bool CheckIfAlreayRunning(out Process process)
+        {
+            bool result = false;
+            process = null;
+            foreach (Process proc in System.Diagnostics.Process.GetProcesses())
+            {
+                if (proc.MainWindowTitle.Contains(ArkSurvivalFolder))
+                {
+                    process = proc;
+                    result = true;               
+                }
+            }
+            return result;
+        }
+
+
+        public void StartServer()
+        {
+            ArkProcess = new Process();
+            ArkProcess.StartInfo.FileName = Path.Combine(ArkSurvivalFolder  ,"ShooterGame" , "Binaries" , "Win64" , "ShooterGameServer.exe");
+            ArkProcess.StartInfo.Arguments = ServerStartArgument + " ";
+            ArkProcess.EnableRaisingEvents = true;
+            ArkProcess.Exited += new EventHandler(ArkProcess_ExitedAsync); // new EventHandler(ArkProcess_ExitedAsync);
+            //ArkProcess.StartInfo.UseShellExecute = true;
+            //ArkProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+
+
+            logs.AddLog(LogType.Information, "Starting server");
+            serverState = ServerState.Running;
+
+            LastDmpCheckTime = DateTime.Now;
+            if (true == CheckIfAlreayRunning(out Process temp))
+            {
+                ArkProcess = temp;
+            }
+            else
+            {
+                ArkProcess.Start();
+            }
+
+
+            TimerServerCrash.Start();
+
+            ArkProcess.PriorityClass = ProcessPriorityClass.High;
+
+            if (!String.IsNullOrEmpty(Affinity))
+            {
+                ArkProcess.ProcessorAffinity = (IntPtr)Int32.Parse(Affinity);
             }
         }
 
@@ -503,48 +523,38 @@ namespace ArkServer
         }
 
 
-        public void StartServerHandler()
+        public void  StartServerHandler()
         {
- 
+
             new Thread(async () =>
-           {
-               Thread.CurrentThread.IsBackground = true;
-               do
-               {
-                   System.Timers.Timer timer = new System.Timers.Timer(TimeSpan.FromMinutes(5).TotalMilliseconds)
-                   {
-                       AutoReset = true
-                   };
-
-                   timer.Elapsed += new ElapsedEventHandler(CheckforUpdatesAsync);
-
-                   Task init = InitServer();
-                   Task.WaitAny(init);
-
-                   if (CheckIfAlreayRunning(out Process temp))
-                   {
-                       logs.AddLog(LogType.Information, "Server is already running. Assuming that server version and Mods are up to date");
-                   }
-                   else
-                   {
-                       UpdateServer();
-
-                       if (NotifyDiscordIsEnabled)
-                       {
-                           Webhook webhook = new Webhook(WebhookDataInterface.MWebhookDataInterface.WebhoockLink);
-                           await webhook.Send("```" + ServerName + ": Server is booting. The server should running in few moments." + "```");
-                       }
-                   }
-                   timer.Start();
-                   StartServerAsync();
-                   timer.Stop();
+            {
+            Thread.CurrentThread.IsBackground = true;
 
 
-               }
-               while (serverState != ServerState.Stopped);
+            TimerUpdateCheck.Elapsed += new ElapsedEventHandler(CheckforUpdatesAsync);
+            TimerServerCrash.Elapsed += new ElapsedEventHandler(WatchServer); 
+
+            await InitServer();
 
 
-           }).Start();
+            if (CheckIfAlreayRunning(out Process temp))
+            {
+                logs.AddLog(LogType.Information, "Server is already running. Assuming that server version and Mods are up to date");
+            }
+            else
+            {
+                UpdateServer();
+
+                if (NotifyDiscordIsEnabled)
+                {
+                    Webhook webhook = new Webhook(WebhookDataInterface.MWebhookDataInterface.WebhoockLink);
+                    await webhook.Send("```" + ServerName + ": Server is booting. The server should running in few moments." + "```");
+                }
+            }
+            TimerUpdateCheck.Start();
+            StartServer();
+
+            }).Start();
         }
     }
 }

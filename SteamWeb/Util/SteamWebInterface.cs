@@ -48,10 +48,13 @@ namespace SteamWeb
 
         public async Task<SteamWebResponse<T>> PostAsync<T>(string interfaceName, string methodName, int version, IList<SteamWebRequestParameter> parameters = null)
         {
-            Debug.Assert(!String.IsNullOrWhiteSpace(methodName));
-            Debug.Assert(version > 0);
 
-            return await steamWebRequest.PostAsync<T>(interfaceName, methodName, version, parameters);
+
+                Debug.Assert(!String.IsNullOrWhiteSpace(methodName));
+                Debug.Assert(version > 0);
+
+                return await steamWebRequest.PostAsync<T>(interfaceName, methodName, version, parameters);
+
         }
 
 

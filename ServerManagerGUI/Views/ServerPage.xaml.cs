@@ -218,7 +218,7 @@ namespace ServerManagerGUI.Views
                 mServer.ModAutoUpdateIsEnabled = (bool)AutoModEnabeld_Button.IsChecked;
                 mServer.NotifyDiscordIsEnabled = (bool)NotifyDiscordEnabeld_Button.IsChecked;
                 mServer.Affinity = TextBox_Affinity.Text;
-                mServer.DailyRestartDate = (DateTime) DailyRestartSelect.DisplayDate;
+                mServer.DailyRestartDate = (DateTime) DailyRestartSelect.SelectedDate;
                 mServer.DailyRestartIsEnabeld = (bool)DailyRestartEnabeld_Button.IsChecked;
 
 

@@ -94,53 +94,71 @@ namespace SteamWeb
             Debug.Assert(!String.IsNullOrWhiteSpace(methodName));
             Debug.Assert(methodVersion > 0);
 
-            if (parameters == null)
+            try
             {
-                parameters = new List<SteamWebRequestParameter>();
+
+                if (parameters == null)
+                {
+                    parameters = new List<SteamWebRequestParameter>();
+                }
+
+                parameters.Insert(0, new SteamWebRequestParameter("key", steamWebApiKey));
+
+                HttpResponseMessage httpResponse = null;
+
+                if (httpMethod == HttpMethod.GET)
+                {
+                    string command = BuildRequestCommand(interfaceName, methodName, methodVersion, parameters);
+
+                    httpResponse = await httpClient.GetAsync(command).ConfigureAwait(false);
+                }
+                else if (httpMethod == HttpMethod.POST)
+                {
+                    // Null is passed instead of the parameters so that they are not appended to the URL.
+                    string command = BuildRequestCommand(interfaceName, methodName, methodVersion, null);
+
+                    // Instead, parameters are passed through this container.
+                    FormUrlEncodedContent content = BuildRequestContent(parameters);
+
+                    httpResponse = await httpClient.PostAsync(command, content).ConfigureAwait(false);
+                }
+
+                var headers = httpResponse.Content?.Headers;
+
+                // extract http headers that we care about
+                SteamWebResponse<T> steamWebResponse = new SteamWebResponse<T>()
+                {
+                    ContentLength = headers?.ContentLength,
+                    ContentType = headers?.ContentType?.MediaType,
+                    ContentTypeCharSet = headers?.ContentType?.CharSet,
+                    Expires = headers?.Expires,
+                    LastModified = headers?.LastModified,
+                };
+
+                // deserialize the content if we have any as indicated by the response code
+                if (httpResponse.StatusCode != HttpStatusCode.NoContent)
+                {
+                    string responseContent = await httpResponse.Content.ReadAsStringAsync();
+                    responseContent = CleanupResponseString(responseContent);
+                    steamWebResponse.Data = JsonConvert.DeserializeObject<T>(responseContent);
+                }
+
+                return steamWebResponse;
+
             }
-
-            parameters.Insert(0, new SteamWebRequestParameter("key", steamWebApiKey));
-
-            HttpResponseMessage httpResponse = null;
-
-            if (httpMethod == HttpMethod.GET)
+            catch
             {
-                string command = BuildRequestCommand(interfaceName, methodName, methodVersion, parameters);
+                SteamWebResponse<T> steamWebResponse = new SteamWebResponse<T>()
+                {
+                    ContentLength =0,
+                    ContentType ="",
+                    ContentTypeCharSet ="",
+                    Expires = DateTimeOffset.MinValue,
+                    LastModified = DateTimeOffset.MinValue,
+                };
 
-                httpResponse = await httpClient.GetAsync(command).ConfigureAwait(false);
+                return steamWebResponse;
             }
-            else if (httpMethod == HttpMethod.POST)
-            {
-                // Null is passed instead of the parameters so that they are not appended to the URL.
-                string command = BuildRequestCommand(interfaceName, methodName, methodVersion, null);
-
-                // Instead, parameters are passed through this container.
-                FormUrlEncodedContent content = BuildRequestContent(parameters);
-
-                httpResponse = await httpClient.PostAsync(command, content).ConfigureAwait(false);
-            }
-
-            var headers = httpResponse.Content?.Headers;
-
-            // extract http headers that we care about
-            SteamWebResponse<T> steamWebResponse = new SteamWebResponse<T>()
-            {
-                ContentLength = headers?.ContentLength,
-                ContentType = headers?.ContentType?.MediaType,
-                ContentTypeCharSet = headers?.ContentType?.CharSet,
-                Expires = headers?.Expires,
-                LastModified = headers?.LastModified,
-            };
-
-            // deserialize the content if we have any as indicated by the response code
-            if (httpResponse.StatusCode != HttpStatusCode.NoContent)
-            {
-                string responseContent = await httpResponse.Content.ReadAsStringAsync();
-                responseContent = CleanupResponseString(responseContent);
-                steamWebResponse.Data = JsonConvert.DeserializeObject<T>(responseContent);
-            }
-
-            return steamWebResponse;
         }
 
         /// <summary>

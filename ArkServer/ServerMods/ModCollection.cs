@@ -32,6 +32,9 @@ namespace ArkServer.ServerMods
             List<int> ActiveMods = new List<int>();
             List<int> ModUpdater = new List<int>();
 
+            mModCollection.Clear();
+
+
             if (true == File.Exists(Path.Combine(Serverpath, "ShooterGame", "Saved", "Config", "WindowsServer", "GameUserSettings.ini")))
             {
                 file = new StreamReader(Path.Combine(Serverpath, "ShooterGame", "Saved", "Config", "WindowsServer", "GameUserSettings.ini"));

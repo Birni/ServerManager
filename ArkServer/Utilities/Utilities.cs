@@ -19,6 +19,57 @@ namespace ArkServer.ServerUtilities
             mServer = server;
         }
 
+
+        public async Task<bool> PingServer()
+        {
+            bool result = false;
+
+            if (mServer.RconEnabled)
+            {
+                INetworkSocket socket = new RconSocket();
+                RconMessenger messenger = new RconMessenger(socket);
+                string response = null;
+
+                try
+                {
+                    await messenger.ConnectAsync(mServer.ServerIp, mServer.RconPort);
+
+                    bool authenticated = await messenger.AuthenticateAsync(mServer.RconPassword);
+
+                    if (authenticated)
+                    {
+                        response = await messenger.ExecuteCommandAsync("a" );
+                    }
+                    else
+                    {
+                        mServer.logs.AddLog(LogType.Critical, "Rcon: Can not authenticate");
+                    }
+
+                    messenger.CloseConnection();
+
+                    if (response.Contains("Server received, But no response!!"))
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                }
+                catch
+                {
+                    mServer.logs.AddLog(LogType.Critical, "Rcon: Can not connect to Rcon");
+                }
+
+            }
+            else
+            {
+                mServer.logs.AddLog(LogType.Information, "Rcon Error: Rcon disabled. Can not broadcast message: " );
+            }
+            return result;
+        }
+
+
         public async Task<bool> BroadcastMessageAsync(string message)
         {
             bool result = false;
@@ -71,26 +122,35 @@ namespace ArkServer.ServerUtilities
 
         public async Task<bool> SaveServerAsync()
         {
-            INetworkSocket socket = new RconSocket();
-            RconMessenger messenger = new RconMessenger(socket);
-            string response = null;
-
-            await messenger.ConnectAsync(mServer.ServerIp, mServer.RconPort);
-
-            bool authenticated = await messenger.AuthenticateAsync(mServer.RconPassword);
-            if (authenticated)
+            try
             {
-                response = await messenger.ExecuteCommandAsync("saveworld ");
+
+                INetworkSocket socket = new RconSocket();
+                RconMessenger messenger = new RconMessenger(socket);
+                string response = null;
+
+                await messenger.ConnectAsync(mServer.ServerIp, mServer.RconPort);
+
+                bool authenticated = await messenger.AuthenticateAsync(mServer.RconPassword);
+                if (authenticated)
+                {
+                    response = await messenger.ExecuteCommandAsync("saveworld ");
+                }
+
+                messenger.CloseConnection();
+
+                if (response.Contains("World Saved"))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
-
-            messenger.CloseConnection();
-
-            if (response.Contains("World Saved"))
+            catch
             {
-                return true;
-            }
-            else
-            {
+                mServer.logs.AddLog(LogType.Critical, "Rcon: Can not connect to Rcon");
                 return false;
             }
 
@@ -100,7 +160,12 @@ namespace ArkServer.ServerUtilities
         {
             mServer.serverState = ServerState.Stopped;
             mServer.logs.AddLog(LogType.Information, "Server stopped by user" );
-            mServer.ArkProcess.Kill();
+
+            if (null != mServer.ArkProcess)
+            {
+                mServer.ArkProcess.Kill();
+            }
+
         }
 
 
@@ -312,12 +377,20 @@ namespace ArkServer.ServerUtilities
 
                     await Task.Delay((int)TimeSpan.FromSeconds(3).TotalMilliseconds).ConfigureAwait(false);
 
-                    mServer.ArkProcess.Kill();
+                    if (null != mServer.ArkProcess)
+                    {
+                        mServer.ArkProcess.Kill();
+                    }
+
 
                     if (restartagain)
                     {
                         await Task.Delay((int)TimeSpan.FromSeconds(3).TotalMilliseconds).ConfigureAwait(false);
                         mServer.StartServerHandler();
+                    }
+                    else
+                    {
+                        mServer.logs.AddLog(LogType.Information, "Server stopped");
                     }
                 }
                 catch (OperationCanceledException)
