@@ -204,10 +204,6 @@
       <Project>{2d630c21-754d-4d2d-93e2-0c7f5d4549ac}</Project>
       <Name>Rcon</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SteamWeb\SteamWeb.csproj">
-      <Project>{e73149b8-fdc0-48f0-b6b7-d40ea40c6499}</Project>
-      <Name>SteamWeb</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Steam\Steam.csproj">
       <Project>{87f1278d-0618-47d0-ba66-7ac59deab351}</Project>
       <Name>Steam</Name>

@@ -57,12 +57,15 @@ namespace ArkServer.ServerMods
             var steamweb = new SteamWebInterface();
             details = await steamweb.SteamWebGetPublishedFileDetails(ModId.ToString());
 
-            if (!String.IsNullOrEmpty(details.Result.Details[0].Title))
+            if (null != details)
             {
-                if (null != details.Result.Details[0].TimeUpdated && ModLastUpdate != DateTime.MinValue && 
-                    details.Result.Details[0].TimeUpdated > ModLastUpdate)
+                if (!String.IsNullOrEmpty(details.Result.Details[0].Title))
                 {
-                    result = true;
+                    if (null != details.Result.Details[0].TimeUpdated && ModLastUpdate != DateTime.MinValue &&
+                        details.Result.Details[0].TimeUpdated > ModLastUpdate)
+                    {
+                        result = true;
+                    }
                 }
             }
 
