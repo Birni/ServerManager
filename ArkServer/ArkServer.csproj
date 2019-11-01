@@ -32,8 +32,8 @@
     <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -58,9 +58,6 @@
     <Compile Include="ServerState.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\DiscordWebHook\DiscordWebHook.csproj">
       <Project>{6127a53a-faa0-44d6-aa60-8a731e97a5c3}</Project>
       <Name>DiscordWebHook</Name>
@@ -69,10 +66,17 @@
       <Project>{2d630c21-754d-4d2d-93e2-0c7f5d4549ac}</Project>
       <Name>Rcon</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SteamWeb\SteamWeb.csproj">
+      <Project>{d6e2d983-4006-4044-b55b-37344f5516fe}</Project>
+      <Name>SteamWeb</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Steam\Steam.csproj">
       <Project>{87f1278d-0618-47d0-ba66-7ac59deab351}</Project>
       <Name>Steam</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

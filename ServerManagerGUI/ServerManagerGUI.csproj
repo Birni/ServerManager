@@ -56,8 +56,8 @@
     <Reference Include="MahApps.Metro.IconPacks, Version=2.3.0.4, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.IconPacks.2.3.0\lib\net46\MahApps.Metro.IconPacks.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -193,7 +193,7 @@
       <Name>ArkServer</Name>
     </ProjectReference>
     <ProjectReference Include="..\DiscordBot\DiscordBot.csproj">
-      <Project>{92c72000-4f29-43e0-9c79-5428c066a7d4}</Project>
+      <Project>{c05bedd3-fae2-41d5-9b66-029ecf32e8ac}</Project>
       <Name>DiscordBot</Name>
     </ProjectReference>
     <ProjectReference Include="..\DiscordWebHook\DiscordWebHook.csproj">
@@ -203,6 +203,10 @@
     <ProjectReference Include="..\Rcon\Rcon.csproj">
       <Project>{2d630c21-754d-4d2d-93e2-0c7f5d4549ac}</Project>
       <Name>Rcon</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SteamWeb\SteamWeb.csproj">
+      <Project>{d6e2d983-4006-4044-b55b-37344f5516fe}</Project>
+      <Name>SteamWeb</Name>
     </ProjectReference>
     <ProjectReference Include="..\Steam\Steam.csproj">
       <Project>{87f1278d-0618-47d0-ba66-7ac59deab351}</Project>
