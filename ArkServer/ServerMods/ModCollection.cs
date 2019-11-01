@@ -97,20 +97,22 @@ namespace ArkServer.ServerMods
             }
         }
 
-        public async Task<List<string>> CheckModsForUpdates()
+        public async Task<bool> CheckModsForUpdates(string ServerName)
         {
             bool needupdate = false;
             Webhook webhook = new Webhook(WebhookDataInterface.MWebhookDataInterface.WebhoockLink);
 
-            List<string> list = new List<string>();
-
             foreach (Mod mod in mModCollection)
             {
-                if (await mod.IsUpaded())
+                if (null != mod)
                 {
-                    mlog.AddLog(LogType.Information, ("ModId: " + mod.ModId + " ModName: " + mod.ModName + "need a update"));
-                    list.Add(mod.ModName);
-                    needupdate = true;
+                    if (await mod.IsUpaded())
+                    {
+                        mlog.AddLog(LogType.Information, ("ModId: " + mod.ModId + " ModName: " + mod.ModName + "need a update"));
+                        Webhook _webhook = new Webhook(WebhookDataInterface.MWebhookDataInterface.WebhoockLink);
+                        await _webhook.Send("```" + ServerName + ": " + mod.ModName + " update is available" + "```");
+                        needupdate = true;
+                    }
                 }
             }
 
@@ -119,7 +121,7 @@ namespace ArkServer.ServerMods
                 mlog.AddLog(LogType.Information, ("All mods are up to date "));
             }
 
-            return list;
+            return needupdate;
         }
 
     }

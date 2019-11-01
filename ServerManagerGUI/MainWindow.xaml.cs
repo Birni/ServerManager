@@ -5,6 +5,7 @@ using System.Windows.Navigation;
 using MahApps.Metro.Controls;
 using ServerManagerGUI.ViewModels;
 using ServerManagerGUI.Navigation;
+using DiscordBot;
 using MenuItem = ServerManagerGUI.ViewModels.MenuItem;
 
 namespace ServerManagerGUI
@@ -26,7 +27,9 @@ namespace ServerManagerGUI
 
             // Navigate to the home page.
             this.Loaded += (sender, args) => Navigation.Navigation.Navigate(new Uri("Views/MainPage.xaml", UriKind.RelativeOrAbsolute));
-        }
+
+           // Bot DiscordBot = new Bot();
+    }
 
         private void SplitViewFrame_OnNavigated(object sender, NavigationEventArgs e)
         {

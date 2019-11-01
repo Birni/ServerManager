@@ -292,6 +292,12 @@ namespace ArkServer
             }
         }
 
+        public void StopRunningTimer()
+        {
+            TimerUpdateCheck.Stop();
+            TimerServerCrash.Stop();
+        }
+
 
         private void WatchServer(object sender, EventArgs e)
         {
@@ -371,30 +377,23 @@ namespace ArkServer
 
                 if (ModAutoUpdateIsEnabled)
                 {
-                    List<string> list = new List<string>();
-                    List<string> updatelist = await Mods.CheckModsForUpdates();
-
-                    if (updatelist.Count > 0)
-                    {
-                        if (NotifyDiscordIsEnabled)
-                        {
-                            foreach (string modname in updatelist)
-                            {
-                                Webhook webhook = new Webhook(WebhookDataInterface.MWebhookDataInterface.WebhoockLink);
-                                await webhook.Send("```" + ServerName + ": " + modname + " update is available" + "```");
-                                logs.AddLog(LogType.Information, modname + " update is available");
-                            }
-                        }
-
-                        needsModUpdate = true;
-                    }
+                    needsModUpdate = await Mods.CheckModsForUpdates(ServerName);   
                 }
 
                 if (true == needsServerUpdate)
                 {
                     Utilities util = new Utilities(this);
+                    bool isAlreadyRunning = false;
 
-                    if (RestartTask.IsCompleted)
+                    if (null != RestartTask)
+                    {
+                        if (!RestartTask.IsCompleted)
+                        {
+                            isAlreadyRunning = true;
+                        }
+                    }
+
+                    if (!isAlreadyRunning)
                     {
                         cancellationTokenRestart = new CancellationTokenSource();
                         RestartTask = util.ServerStopOrRestart(30, "Ark update", true, cancellationTokenRestart.Token);
@@ -406,8 +405,17 @@ namespace ArkServer
                 if (true == needsModUpdate)
                 {
                     Utilities util = new Utilities(this);
+                    bool isAlreadyRunning = false;
 
-                    if (RestartTask.IsCompleted)
+                    if (null != RestartTask)
+                    {
+                        if (!RestartTask.IsCompleted)
+                        {
+                            isAlreadyRunning = true;
+                        }
+                    }
+
+                    if (!isAlreadyRunning)
                     {
                         cancellationTokenRestart = new CancellationTokenSource();
                         RestartTask = util.ServerStopOrRestart(30, "Ark update", true, cancellationTokenRestart.Token);

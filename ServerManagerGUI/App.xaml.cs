@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DiscordBot;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -47,6 +48,7 @@ namespace ServerManagerGUI
             w.WriteLine("  :{0}", logMessage);
             w.WriteLine("-------------------------------");
         }
+
 
     }
 }

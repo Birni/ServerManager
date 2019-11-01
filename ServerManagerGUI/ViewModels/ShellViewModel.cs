@@ -15,6 +15,8 @@ namespace ServerManagerGUI.ViewModels
         {
             BuildMenu();
             BuildOptionsMenuMenu();
+
+
         }
 
         internal void BuildMenu()

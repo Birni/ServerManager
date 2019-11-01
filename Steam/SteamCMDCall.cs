@@ -96,8 +96,26 @@ namespace Steam
                         output = Regex.Replace(output, @"\t|\n|\r|\{", "");
                         var splitoutput = output.Split('\"');
 
-                        appinfo.buildid = Int32.Parse(splitoutput[5]);
-                        appinfo.timeupdated = Int32.Parse(splitoutput[9]);
+                        if (!string.IsNullOrEmpty(splitoutput[5]))
+                        {
+                            if (true == Int32.TryParse(splitoutput[5], out int id))
+                            {
+                                if (id != 0)
+                                {
+                                    appinfo.buildid = id;
+                                }
+                            }
+                        }
+                        if (!string.IsNullOrEmpty(splitoutput[9]))
+                        {
+                            if (true == Int32.TryParse(splitoutput[9], out int time))
+                            {
+                                if (time != 0)
+                                {
+                                    appinfo.timeupdated = time;
+                                }
+                            }
+                        }
                     }
 
 

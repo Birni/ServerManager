@@ -61,10 +61,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DiscordBot\DiscordBot.csproj">
-      <Project>{92c72000-4f29-43e0-9c79-5428c066a7d4}</Project>
-      <Name>DiscordBot</Name>
-    </ProjectReference>
     <ProjectReference Include="..\DiscordWebHook\DiscordWebHook.csproj">
       <Project>{6127a53a-faa0-44d6-aa60-8a731e97a5c3}</Project>
       <Name>DiscordWebHook</Name>

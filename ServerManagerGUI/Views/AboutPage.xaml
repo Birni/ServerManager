@@ -28,7 +28,7 @@
 
             <StackPanel Grid.Row="0"  VerticalAlignment="Center"  Margin="0,200,0,0">
                 <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Height="auto" Width="1000" TextWrapping="Wrap" FontSize="20" >
-                    Ark Server Manager Version 0.0.0.2 (Early Beta)
+                    Ark Server Manager Version 0.0.0.6 (Early Beta)
                 </TextBlock>
             </StackPanel>
 

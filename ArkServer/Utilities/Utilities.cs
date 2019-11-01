@@ -373,7 +373,12 @@ namespace ArkServer.ServerUtilities
                         }
                     }
 
+
+
                     mServer.serverState = ServerState.Stopped;
+
+                    mServer.StopRunningTimer();
+
 
                     await Task.Delay((int)TimeSpan.FromSeconds(3).TotalMilliseconds).ConfigureAwait(false);
 
