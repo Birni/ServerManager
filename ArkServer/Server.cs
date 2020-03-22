@@ -257,6 +257,8 @@ namespace ArkServer
         {
             logs.AddLog(LogType.Information, "Initialize server");
             serverState = ServerState.Initialize;
+
+
             await Mods.DetermineMods(ArkSurvivalFolder);
             AppInfo appinfo = new AppInfo();
             appinfo = await DetermieAppInfo();
@@ -479,7 +481,8 @@ namespace ArkServer
                 if (proc.MainWindowTitle.Contains(ArkSurvivalFolder))
                 {
                     process = proc;
-                    result = true;               
+                    result = true;
+                    break;
                 }
             }
             return result;
@@ -548,9 +551,13 @@ namespace ArkServer
 
 
             TimerUpdateCheck.Elapsed += new ElapsedEventHandler(CheckforUpdatesAsync);
-            TimerServerCrash.Elapsed += new ElapsedEventHandler(WatchServer); 
+            TimerServerCrash.Elapsed += new ElapsedEventHandler(WatchServer);
 
-            await InitServer();
+
+                if (this != null)
+                {
+                    await InitServer();
+                }
 
 
             if (CheckIfAlreayRunning(out Process temp))
