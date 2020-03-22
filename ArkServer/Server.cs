@@ -326,8 +326,8 @@ namespace ArkServer
                             {
                                 if (null != ArkProcess)
                                 {
-                                    ArkProcess.Kill();
                                     serverState = ServerState.Crashed;
+                                    ArkProcess.Kill();
                                 }
                             }
                         }
@@ -466,6 +466,7 @@ namespace ArkServer
                     await webhook.Send("```" + ServerName + ": Opps the server crashed!! A team of highly trained jerboas has been dispatched to deal with this situation. Please stay calm!" + "```");
                 }
 
+                serverState = ServerState.Initialize;
                 StartServerHandler();
             }
 
@@ -478,11 +479,14 @@ namespace ArkServer
             process = null;
             foreach (Process proc in System.Diagnostics.Process.GetProcesses())
             {
-                if (proc.MainWindowTitle.Contains(ArkSurvivalFolder))
+                if (proc.ProcessName.Equals("ShooterGameServer"))
                 {
-                    process = proc;
-                    result = true;
-                    break;
+                    if (proc.MainWindowTitle.Contains((ArkSurvivalFolder.Replace(@"\\", @"\")).Replace(@"\", @"/")))
+                    {
+                        process = proc;
+                        result = true;
+                        break;
+                    }
                 }
             }
             return result;
@@ -550,14 +554,28 @@ namespace ArkServer
             Thread.CurrentThread.IsBackground = true;
 
 
+            TimerUpdateCheck.Dispose();
+            TimerServerCrash.Dispose();
+
+            TimerUpdateCheck = new System.Timers.Timer(TimeSpan.FromMinutes(5).TotalMilliseconds)
+            {
+                AutoReset = true
+            };
+
+        
+            TimerServerCrash = new System.Timers.Timer(TimeSpan.FromSeconds(20).TotalMilliseconds)
+            {
+                AutoReset = true
+            };
+
             TimerUpdateCheck.Elapsed += new ElapsedEventHandler(CheckforUpdatesAsync);
             TimerServerCrash.Elapsed += new ElapsedEventHandler(WatchServer);
 
 
-                if (this != null)
-                {
-                    await InitServer();
-                }
+            if (this != null)
+            {
+                await InitServer();
+            }
 
 
             if (CheckIfAlreayRunning(out Process temp))

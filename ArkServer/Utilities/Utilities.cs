@@ -156,6 +156,43 @@ namespace ArkServer.ServerUtilities
 
         }
 
+
+        public async Task<bool> CloseArkCloudAsync()
+        {
+            try
+            {
+
+                INetworkSocket socket = new RconSocket();
+                RconMessenger messenger = new RconMessenger(socket);
+                string response = null;
+
+                await messenger.ConnectAsync(mServer.ServerIp, mServer.RconPort);
+
+                bool authenticated = await messenger.AuthenticateAsync(mServer.RconPassword);
+                if (authenticated)
+                {
+                    response = await messenger.ExecuteCommandAsync("CloseCloud");
+                }
+
+                messenger.CloseConnection();
+
+                if (response.Contains("successfully"))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch
+            {
+                mServer.logs.AddLog(LogType.Critical, "Rcon: Can not connect to Rcon");
+                return false;
+            }
+
+        }
+
         public void ServerStopImmediately()
         {
             mServer.serverState = ServerState.Stopped;
@@ -179,6 +216,7 @@ namespace ArkServer.ServerUtilities
                 string cancelbroadcastmessage;
                 string discordnotification;
                 string canceldiscordnotification;
+                Boolean isArkCloudClosed = false;
                 TimeSpan WaitTime = TimeSpan.Zero;
 
 
@@ -324,6 +362,21 @@ namespace ArkServer.ServerUtilities
                         await BroadcastMessageAsync(string.Format(broadcastmessage, 5));
                         mServer.logs.AddLog(LogType.Information, string.Format(broadcastmessage, 5));
 
+
+                        if (false == isArkCloudClosed)
+                        {
+                            if (await CloseArkCloudAsync())
+                            {
+                                isArkCloudClosed = true;
+                                await BroadcastMessageAsync(string.Format("successfully closed ark cloud access"));
+                                mServer.logs.AddLog(LogType.Information, "successfully closed ark cloud access");
+                            }
+                            else
+                            {
+                                mServer.logs.AddLog(LogType.Information, "can not close ark cloud access");
+                            }
+                        }
+
                         WaitTime = TimeSpan.Zero;
                         while (WaitTime < TimeSpan.FromMinutes(4))
                         {
@@ -346,6 +399,22 @@ namespace ArkServer.ServerUtilities
                         await BroadcastMessageAsync(string.Format(broadcastmessage, 1));
                         mServer.logs.AddLog(LogType.Information, string.Format(broadcastmessage, 1));
 
+
+                        if (false == isArkCloudClosed)
+                        {
+                            if (await CloseArkCloudAsync())
+                            {
+                                isArkCloudClosed = true;
+                                await BroadcastMessageAsync(string.Format("successfully closed ark cloud access"));
+                                mServer.logs.AddLog(LogType.Information, "successfully closed ark cloud access");
+                            }
+                            else
+                            {
+                                mServer.logs.AddLog(LogType.Information, "can not close ark cloud access");
+                            }
+                        }
+
+
                         WaitTime = TimeSpan.Zero;
                         while (WaitTime < TimeSpan.FromMinutes(1))
                         {
@@ -355,6 +424,20 @@ namespace ArkServer.ServerUtilities
                             {
                                 cancellationToken.ThrowIfCancellationRequested();
                             }
+                        }
+                    }
+
+                    if (false == isArkCloudClosed)
+                    {
+                        if (await CloseArkCloudAsync())
+                        {
+                            isArkCloudClosed = true;
+                            await BroadcastMessageAsync(string.Format("Successfully closed ark cloud access"));
+                            mServer.logs.AddLog(LogType.Information, "Successfully closed ark cloud access");
+                        }
+                        else
+                        {
+                            mServer.logs.AddLog(LogType.Information, "Can not close ark cloud access");
                         }
                     }
 

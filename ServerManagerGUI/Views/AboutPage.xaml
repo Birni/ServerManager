@@ -28,7 +28,7 @@
 
             <StackPanel Grid.Row="0"  VerticalAlignment="Center"  Margin="0,200,0,0">
                 <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Height="auto" Width="1000" TextWrapping="Wrap" FontSize="20" >
-                    Ark Server Manager Version 0.0.0.6 (Early Beta)
+                    Ark Server Manager Version 0.0.0.7 (Early Beta)
                 </TextBlock>
             </StackPanel>
 
@@ -43,12 +43,56 @@
             </StackPanel>
 
             <StackPanel Grid.Row="2"  VerticalAlignment="Center"  Margin="0,20,0,0">
-                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Height="auto" Width="1000"  TextWrapping="Wrap" FontSize="20" >
+                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Height="auto" Width="1000"  TextWrapping="Wrap" FontSize="20">
                     Software is prerelease code and is not at the level of performance or compatibility of a final, generally available product offering. 
                     Software may not operate correctly and may be substantially modified prior to first commercial shipment, or withdrawn. Software is provided "AS IS" without warranty of any kind. 
                     The entire risk arising out of the use or performance of Software remains with Licensee. In no event shall I am liable for any damage whatsoever 
                     arising out of the use of or inability to use Software, even if I am has been advised of the possibility of such damages.
+                    <LineBreak/>
+                    <LineBreak/>
                 </TextBlock>
+                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Height="auto" Width="1000"  TextWrapping="Wrap" FontSize="20">
+                 <TextBlock TextDecorations="Underline">Current Version: 0.0.0.7 </TextBlock>
+                 <LineBreak/>
+                 <TextBlock> 
+                    <BulletDecorator>
+                        <BulletDecorator.Bullet>
+                        <Ellipse Height="5" Width="5" Fill="Black"/>
+                        </BulletDecorator.Bullet>
+                        <TextBlock>potential bugfix for multiple server restarts after crash </TextBlock>
+                    </BulletDecorator>
+                    <LineBreak/> 
+                    <BulletDecorator>
+                        <BulletDecorator.Bullet>
+                        <Ellipse Height="5" Width="5" Fill="Black"/>
+                        </BulletDecorator.Bullet>
+                        <TextBlock> potential bugfix for multiple update detections and restarts </TextBlock>
+                    </BulletDecorator>
+                    <LineBreak/> 
+                    <BulletDecorator>
+                        <BulletDecorator.Bullet>
+                        <Ellipse Height="5" Width="5" Fill="Black"/>
+                        </BulletDecorator.Bullet>
+                        <TextBlock> no longer matters if backslash and a forward slash used in server path</TextBlock>
+                    </BulletDecorator>
+                    <LineBreak/> 
+                    <BulletDecorator>
+                        <BulletDecorator.Bullet>
+                        <Ellipse Height="5" Width="5" Fill="Black"/>
+                        </BulletDecorator.Bullet>
+                        <TextBlock> detection if server already runs now consider only ShooterGameServer prozesses </TextBlock>
+                    </BulletDecorator>
+                    <LineBreak/> 
+                    <BulletDecorator>
+                        <BulletDecorator.Bullet>
+                        <Ellipse Height="5" Width="5" Fill="Black"/>
+                        </BulletDecorator.Bullet>
+                        <TextBlock> added "CloseCloud" rcon command to restart and shutdown procedure </TextBlock>
+                    </BulletDecorator>
+                     
+                 </TextBlock>
+                </TextBlock>
+
             </StackPanel>
 
         </Grid>
